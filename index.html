@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="fr" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation de criticité projet (IQP)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip-text {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+            line-height: 1.5;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 18px;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        .badge-green {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            border: 2px solid #22c55e;
+        }
+
+        .badge-orange {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+
+        .badge-red {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #475569;
+            border: 2px solid #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #dc2626;
+            border: 2px solid #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            transform: translateY(-2px);
+        }
+
+        .score-display {
+            font-size: 64px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            stroke: #e2e8f0;
+        }
+
+        .progress-ring-fill {
+            transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #e2e8f0 0%, transparent 100%);
+        }
+
+        .vigilance-item {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .blocking-rule {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-radius: 12px;
+            border: 2px solid #ef4444;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 20px;
+            padding: 32px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .criteria-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .criteria-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .multisite-toggle {
+            display: flex;
+            gap: 12px;
+        }
+
+        .multisite-option {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            background: #f8fafc;
+        }
+
+        .multisite-option:hover {
+            border-color: #3b82f6;
+            background: white;
+        }
+
+        .multisite-option.active {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #2563eb;
+        }
+
+        .multisite-option.active-yes {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+        }
+
+        .bonus-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #166534;
+            margin-left: 12px;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+                break-inside: avoid;
+            }
+
+            .result-section {
+                border: 2px solid #1e293b !important;
+            }
+
+            .badge {
+                border: 2px solid currentColor !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .score-display {
+                font-size: 48px;
+            }
+
+            .progress-ring {
+                width: 140px;
+                height: 140px;
+            }
+        }
+    </style>
+    <style>
+        @view-transition {
+            navigation: auto;
+        }
+    </style>
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+</head>
+
+<body class="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+    <div class="h-full overflow-auto">
+        <div class="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8"><!-- Header -->
+            <header class="text-center mb-10">
+                <div class="inline-flex items-center gap-3 px-5 py-2 bg-white rounded-full shadow-sm mb-6"><span
+                        class="text-2xl">📊</span> <span
+                        class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Outil d'aide à la
+                        décision</span>
+                </div>
+                <h1 id="main-title" class="text-3xl sm:text-4xl font-bold text-slate-800 mb-3">Évaluation de criticité
+                    projet (IQP)</h1>
+                <p id="subtitle" class="text-lg text-slate-500">Scoring basé sur 7 critères – décision IQP automatique
+                </p>
+            </header>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><!-- Section A - Infos projet -->
+                <div class="card p-6">
+                    <div class="section-title"><span>📁</span> Informations projet
+                    </div>
+                    <div class="space-y-5">
+                        <div><label for="project-name" class="block text-sm font-semibold text-slate-700 mb-2">Nom du
+                                projet</label> <input type="text" id="project-name" class="input-field"
+                                placeholder="Ex: Projet Alpha 2026">
+                        </div>
+                        <div><label for="client" class="block text-sm font-semibold text-slate-700 mb-2">Client</label>
+                            <input type="text" id="client" class="input-field" placeholder="Ex: Entreprise AAS">
+                        </div>
+                        <div><label for="project-manager" class="block text-sm font-semibold text-slate-700 mb-2">Chef
+                                de projet</label> <input type="text" id="project-manager" class="input-field"
+                                placeholder="Ex: Xxxx xxxxx">
+                        </div>
+                        <div><label for="department" class="block text-sm font-semibold text-slate-700 mb-2">BU /
+                                Département</label> <input type="text" id="department" class="input-field"
+                                placeholder="Ex: Industry BU">
+                        </div>
+                    </div>
+                </div><!-- Score Display -->
+                <div class="card p-6 flex flex-col items-center justify-center">
+                    <div class="section-title w-full"><span>🎯</span> Score en temps réel
+                    </div>
+                    <div class="progress-ring mb-6">
+                        <svg width="180" height="180" viewbox="0 0 180 180">
+                            <circle class="progress-ring-bg" cx="90" cy="90" r="80" fill="none" stroke-width="12" />
+                            <circle id="progress-circle" class="progress-ring-fill" cx="90" cy="90" r="80" fill="none"
+                                stroke-width="12" stroke="#22c55e" stroke-linecap="round" stroke-dasharray="502.65"
+                                stroke-dashoffset="502.65" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="score-value"
+                                class="score-display">21</span> <span
+                                class="text-slate-400 font-semibold text-lg">/36</span>
+                        </div>
+                    </div>
+                    <div id="result-badge" class="badge badge-green">
+                        🟢 Classe Faible
+                    </div>
+                    <p id="result-decision" class="text-center mt-4 font-medium text-slate-600">Qualité transverse (pas
+                        d'IQP dédié)</p>
+                    <div id="multisite-bonus" class="bonus-indicator hidden"><span>➕</span> Bonus multi-sites: +1
+                    </div>
+                </div>
+            </div><!-- Section B - Critères -->
+            <div class="card p-6 mb-8">
+                <div class="section-title"><span>⚖️</span> Critères d'évaluation
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><!-- Critère 1 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">1</span> Criticité
+                            produit / sécurité </label> <select id="criteria-1" class="select-field" required>
+                            <option value="1">1 - Faible</option>
+                            <option value="2">2 - Modérée</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Élevée</option>
+                            <option value="5">5 - Critique</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Pas d'impact sécurité • 2=Impact limité • 3=Impact modéré • 4=Impact important • 5=Vie
+                            humaine/réglementation critique
+                        </div>
+                    </div><!-- Critère 2 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">2</span> Client
+                            &amp; exigences contractuelles </label> <select id="criteria-2" class="select-field"
+                            required>
+                            <option value="1">1 - Faible</option>
+                            <option value="2">2 - Modérée</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Élevée</option>
+                            <option value="5">5 - Critique</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Client flexible • 2=Quelques exigences • 3=Exigences standards • 4=Client exigeant •
+                            5=Pénalités/certifications obligatoires
+                        </div>
+                    </div><!-- Critère 3 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">3</span>
+                            Complexité technique </label> <select id="criteria-3" class="select-field" required>
+                            <option value="1">1 - Faible</option>
+                            <option value="2">2 - Modérée</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Élevée</option>
+                            <option value="5">5 - Critique</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Standard/répétitif • 2=Quelques nouveautés • 3=Complexité moyenne • 4=Technos nouvelles •
+                            5=Innovation majeure/R&amp;D
+                        </div>
+                    </div><!-- Critère 4 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">4</span> Maturité
+                            de l'équipe </label> <select id="criteria-4" class="select-field" required>
+                            <option value="1">1 - Très expérimentée</option>
+                            <option value="2">2 - Expérimentée</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Junior</option>
+                            <option value="5">5 - Très junior</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Équipe rodée, processus maîtrisés • 3=Mix junior/senior • 5=Équipe nouvelle, peu
+                            d'expérience qualité
+                        </div>
+                    </div><!-- Critère 5 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">5</span>
+                            Historique qualité </label> <select id="criteria-5" class="select-field" required>
+                            <option value="1">1 - Excellent</option>
+                            <option value="2">2 - Bon</option>
+                            <option value="3" selected>3 - Moyen</option>
+                            <option value="4">4 - Problématique</option>
+                            <option value="5">5 - Critique</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Aucun incident passé • 3=Quelques NC mineures • 5=Historique de NC majeures/réclamations
+                            clients
+                        </div>
+                    </div><!-- Critère 6 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">6</span> Pression
+                            planning / délais </label> <select id="criteria-6" class="select-field" required>
+                            <option value="1">1 - Faible</option>
+                            <option value="2">2 - Modérée</option>
+                            <option value="3" selected>3 - Moyenne</option>
+                            <option value="4">4 - Forte</option>
+                            <option value="5">5 - Extrême</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=Planning souple • 3=Délais standards • 5=Délais très serrés, pas de marge
+                        </div>
+                    </div><!-- Critère 7 -->
+                    <div class="tooltip"><label class="criteria-label"> <span class="criteria-number">7</span> Nombre de
+                            ressources impliquées </label> <select id="criteria-7" class="select-field" required>
+                            <option value="1">1 - 1-2 personnes</option>
+                            <option value="2">2 - 3-5 personnes</option>
+                            <option value="3" selected>3 - 6-10 personnes</option>
+                            <option value="4">4 - 11-20 personnes</option>
+                            <option value="5">5 - &gt;20 / multi-équipes</option>
+                        </select>
+                        <div class="tooltip-text">
+                            1=1–2 pers • 2=3–5 pers • 3=6–10 pers • 4=11–20 pers • 5=&gt;20/multi-équipes
+                        </div>
+                    </div><!-- Multi-sites -->
+                    <div><label class="criteria-label"> <span
+                                class="inline-flex items-center justify-center w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-lg text-xs font-bold">+</span>
+                            Projet multi-sites ? </label>
+                        <div class="multisite-toggle"><button type="button" id="multisite-no"
+                                class="multisite-option active" onclick="setMultisite(false)"> Non </button> <button
+                                type="button" id="multisite-yes" class="multisite-option" onclick="setMultisite(true)">
+                                Oui (+1 point) </button>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Règles de décision -->
+            <div class="card p-6 mb-8">
+                <div class="section-title"><span>📋</span> Règles de décision
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                        <div class="flex items-center gap-3 mb-2"><span class="text-2xl">🟢</span> <span
+                                class="font-bold text-green-800">Faible</span>
+                        </div>
+                        <p class="text-sm text-green-700">Score ≤ 12</p>
+                        <p class="text-xs text-green-600 mt-2">Qualité transverse (pas d'IQP dédié)</p>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl border-2 border-amber-200">
+                        <div class="flex items-center gap-3 mb-2"><span class="text-2xl">🟠</span> <span
+                                class="font-bold text-amber-800">Moyenne</span>
+                        </div>
+                        <p class="text-sm text-amber-700">Score 13 à 21</p>
+                        <p class="text-xs text-amber-600 mt-2">IQP partagé / part-time recommandé</p>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border-2 border-red-200">
+                        <div class="flex items-center gap-3 mb-2"><span class="text-2xl">🔴</span> <span
+                                class="font-bold text-red-800">Haute</span>
+                        </div>
+                        <p class="text-sm text-red-700">Score ≥ 22</p>
+                        <p class="text-xs text-red-600 mt-2">IQP dédié obligatoire</p>
+                    </div>
+                </div>
+                <div
+                    class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-200">
+                    <div class="flex items-center gap-3"><span class="text-xl">⚠️</span>
+                        <div><span class="font-bold text-purple-800">Règle bloquante:</span> <span
+                                class="text-sm text-purple-700 ml-2">Si au moins un critère = 5 OU Critère 7 = 5 → IQP
+                                dédié obligatoire</span>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Résultats détaillés -->
+            <div class="result-section mb-8">
+                <div class="section-title"><span>📊</span> Analyse détaillée
+                </div>
+                <div id="vigilance-section" class="mb-6">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><span class="text-xl">👁️</span>
+                        Points de vigilance</h3>
+                    <div id="vigilance-list">
+                        <p class="text-slate-500 italic">Aucun critère ≥ 4 détecté</p>
+                    </div>
+                </div>
+                <div id="blocking-section" class="hidden">
+                    <div class="blocking-rule"><span class="text-3xl">🚨</span>
+                        <div>
+                            <p class="font-bold text-red-800">Règle bloquante déclenchée</p>
+                            <p id="blocking-reason" class="text-sm text-red-600">Un ou plusieurs critères sont à 5</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Boutons d'action -->
+            <div class="flex flex-wrap gap-4 justify-center no-print"><button type="button" class="btn btn-danger"
+                    onclick="resetForm()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewbox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg> Réinitialiser </button> <button type="button" class="btn btn-secondary"
+                    onclick="exportCSV()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewbox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg> Exporter CSV </button> <button type="button" class="btn btn-primary" onclick="printReport()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewbox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
+                    </svg> Imprimer / PDF </button>
+            </div><!-- Footer -->
+            <footer class="text-center mt-10 text-sm text-slate-400">
+                <p>© 2026 – Outil d'évaluation de criticité _ DHAFER BOUTHELJA</p>
+            </footer>
+        </div>
+    </div>
+    <script>
+        // Configuration
+        const defaultConfig = {
+            main_title: "Évaluation de criticité projet (ECP)",
+            subtitle: "Scoring basé sur 7 critères – décision automatique"
+        };
+
+        let config = { ...defaultConfig };
+        let isMultisite = false;
+
+        // Element SDK initialization
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange: async (newConfig) => {
+                    config = { ...defaultConfig, ...newConfig };
+                    applyConfig();
+                },
+                mapToCapabilities: () => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (cfg) => new Map([
+                    ["main_title", cfg.main_title || defaultConfig.main_title],
+                    ["subtitle", cfg.subtitle || defaultConfig.subtitle]
+                ])
+            });
+        }
+
+        function applyConfig() {
+            document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+            document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+        }
+
+        // Criteria definitions for tooltips and vigilance messages
+        const criteriaNames = {
+            1: "Criticité produit / sécurité",
+            2: "Client & exigences contractuelles",
+            3: "Complexité technique",
+            4: "Maturité de l'équipe",
+            5: "Historique qualité",
+            6: "Pression planning / délais",
+            7: "Nombre de ressources impliquées"
+        };
+
+        // Set multisite toggle
+        function setMultisite(value) {
+            isMultisite = value;
+            const noBtn = document.getElementById('multisite-no');
+            const yesBtn = document.getElementById('multisite-yes');
+
+            if (value) {
+                noBtn.classList.remove('active');
+                yesBtn.classList.add('active', 'active-yes');
+            } else {
+                noBtn.classList.add('active');
+                yesBtn.classList.remove('active', 'active-yes');
+            }
+
+            calculateScore();
+        }
+
+        // Calculate score
+        function calculateScore() {
+            let totalScore = 0;
+            const criteriaValues = {};
+            const vigilanceItems = [];
+            let hasBlockingRule = false;
+            let blockingReasons = [];
+
+            // Get all criteria values
+            for (let i = 1; i <= 7; i++) {
+                const select = document.getElementById(`criteria-${i}`);
+                const value = parseInt(select.value);
+                criteriaValues[i] = value;
+                totalScore += value;
+
+                // Check for vigilance (>= 4)
+                if (value >= 4) {
+                    vigilanceItems.push({
+                        criteria: i,
+                        name: criteriaNames[i],
+                        value: value
+                    });
+                }
+
+                // Check blocking rule (any criteria = 5)
+                if (value === 5) {
+                    hasBlockingRule = true;
+                    blockingReasons.push(`Critère ${i} (${criteriaNames[i]}) = 5`);
+                }
+            }
+
+            // Add multisite bonus
+            const multisiteBonus = isMultisite ? 1 : 0;
+            totalScore += multisiteBonus;
+
+            // Update multisite bonus indicator
+            const bonusIndicator = document.getElementById('multisite-bonus');
+            if (isMultisite) {
+                bonusIndicator.classList.remove('hidden');
+            } else {
+                bonusIndicator.classList.add('hidden');
+            }
+
+            // Determine class and decision
+            let classLevel, classEmoji, decision, badgeClass;
+
+            if (hasBlockingRule || totalScore >= 22) {
+                classLevel = "Haute";
+                classEmoji = "🔴";
+                decision = hasBlockingRule ? "IQP dédié obligatoire (règle bloquante)" : "IQP dédié obligatoire";
+                badgeClass = "badge-red";
+            } else if (totalScore >= 13) {
+                classLevel = "Moyenne";
+                classEmoji = "🟠";
+                decision = "IQP partagé / part-time recommandé";
+                badgeClass = "badge-orange";
+            } else {
+                classLevel = "Faible";
+                classEmoji = "🟢";
+                decision = "Qualité transverse (pas d'IQP dédié)";
+                badgeClass = "badge-green";
+            }
+
+            // Update UI
+            updateScoreDisplay(totalScore, classLevel, classEmoji, decision, badgeClass);
+            updateVigilanceList(vigilanceItems);
+            updateBlockingSection(hasBlockingRule, blockingReasons);
+            updateProgressRing(totalScore, badgeClass);
+        }
+
+        function updateScoreDisplay(score, classLevel, emoji, decision, badgeClass) {
+            document.getElementById('score-value').textContent = score;
+
+            const badge = document.getElementById('result-badge');
+            badge.className = `badge ${badgeClass}`;
+            badge.innerHTML = `${emoji} Classe ${classLevel}`;
+
+            document.getElementById('result-decision').textContent = decision;
+        }
+
+        function updateProgressRing(score, badgeClass) {
+            const circle = document.getElementById('progress-circle');
+            const circumference = 2 * Math.PI * 80; // r=80
+            const percentage = score / 36;
+            const offset = circumference * (1 - percentage);
+
+            circle.style.strokeDashoffset = offset;
+
+            // Update color based on class
+            if (badgeClass === 'badge-red') {
+                circle.style.stroke = '#ef4444';
+            } else if (badgeClass === 'badge-orange') {
+                circle.style.stroke = '#f59e0b';
+            } else {
+                circle.style.stroke = '#22c55e';
+            }
+        }
+
+        function updateVigilanceList(items) {
+            const container = document.getElementById('vigilance-list');
+
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 italic">Aucun critère ≥ 4 détecté</p>';
+            } else {
+                container.innerHTML = items.map(item => `
+          <div class="vigilance-item">
+            <strong>Critère ${item.criteria}:</strong> ${item.name} 
+            <span class="ml-2 px-2 py-1 bg-amber-200 rounded-full text-xs font-bold">${item.value}/5</span>
+          </div>
+        `).join('');
+            }
+        }
+
+        function updateBlockingSection(isBlocking, reasons) {
+            const section = document.getElementById('blocking-section');
+            const reasonEl = document.getElementById('blocking-reason');
+
+            if (isBlocking) {
+                section.classList.remove('hidden');
+                reasonEl.textContent = reasons.join(' • ');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            // Reset project info
+            document.getElementById('project-name').value = '';
+            document.getElementById('client').value = '';
+            document.getElementById('project-manager').value = '';
+            document.getElementById('department').value = '';
+
+            // Reset criteria to default (3)
+            for (let i = 1; i <= 7; i++) {
+                document.getElementById(`criteria-${i}`).value = '3';
+            }
+
+            // Reset multisite
+            setMultisite(false);
+
+            // Recalculate
+            calculateScore();
+        }
+
+        // Export to CSV
+        function exportCSV() {
+            const date = new Date().toLocaleDateString('fr-FR');
+            const projectName = document.getElementById('project-name').value || 'Non spécifié';
+            const client = document.getElementById('client').value || 'Non spécifié';
+            const projectManager = document.getElementById('project-manager').value || 'Non spécifié';
+            const department = document.getElementById('department').value || 'Non spécifié';
+
+            const criteria = [];
+            let totalScore = 0;
+            for (let i = 1; i <= 7; i++) {
+                const value = parseInt(document.getElementById(`criteria-${i}`).value);
+                criteria.push(value);
+                totalScore += value;
+            }
+
+            const multisiteBonus = isMultisite ? 1 : 0;
+            totalScore += multisiteBonus;
+
+            let classLevel, decision;
+            const hasBlocking = criteria.some(v => v === 5);
+
+            if (hasBlocking || totalScore >= 22) {
+                classLevel = "Haute";
+                decision = hasBlocking ? "IQP dédié obligatoire (règle bloquante)" : "IQP dédié obligatoire";
+            } else if (totalScore >= 13) {
+                classLevel = "Moyenne";
+                decision = "IQP partagé / part-time recommandé";
+            } else {
+                classLevel = "Faible";
+                decision = "Qualité transverse (pas d'IQP dédié)";
+            }
+
+            const headers = [
+                'Date',
+                'Projet',
+                'Client',
+                'Chef de projet',
+                'BU/Département',
+                'Critère 1 - Criticité produit',
+                'Critère 2 - Exigences client',
+                'Critère 3 - Complexité technique',
+                'Critère 4 - Maturité équipe',
+                'Critère 5 - Historique qualité',
+                'Critère 6 - Pression planning',
+                'Critère 7 - Ressources',
+                'Multi-sites',
+                'Score total',
+                'Classe',
+                'Décision'
+            ];
+
+            const values = [
+                date,
+                projectName,
+                client,
+                projectManager,
+                department,
+                ...criteria,
+                isMultisite ? 'Oui' : 'Non',
+                totalScore,
+                classLevel,
+                decision
+            ];
+
+            // Create CSV content with proper escaping
+            const escapeCSV = (str) => {
+                const stringified = String(str);
+                if (stringified.includes(',') || stringified.includes('"') || stringified.includes('\n')) {
+                    return `"${stringified.replace(/"/g, '""')}"`;
+                }
+                return stringified;
+            };
+
+            const csvContent = [
+                headers.map(escapeCSV).join(','),
+                values.map(escapeCSV).join(',')
+            ].join('\n');
+
+            // Add BOM for Excel UTF-8 compatibility
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `evaluation-iqp-${projectName.replace(/[^a-zA-Z0-9]/g, '_')}-${date.replace(/\//g, '-')}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Print report
+        function printReport() {
+            window.print();
+        }
+
+        // Add event listeners to all criteria selects
+        function initEventListeners() {
+            for (let i = 1; i <= 7; i++) {
+                document.getElementById(`criteria-${i}`).addEventListener('change', calculateScore);
+            }
+        }
+
+        // Initialize
+        initEventListeners();
+        calculateScore();
+        applyConfig();
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9c8cb20f70c95bc9',t:'MTc3MDIzNDYxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
