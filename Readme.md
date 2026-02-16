@@ -1,213 +1,277 @@
-# 📊 Évaluation de Criticité Projet – Modèle par Axes Pondérés
+# 📊 Évaluation de Criticité Projet (IQP)
 
-## 1. Contexte
-
-Dans un environnement multi-projets avec des ressources Qualité limitées, il est essentiel de **prioriser les projets selon leur niveau réel de criticité** afin d’adapter la gouvernance et le niveau de support Qualité.
-
-Cet outil permet de :
-
-* Évaluer la **criticité globale d’un projet** de manière structurée
-* Classer les projets selon **3 niveaux de risque**
-* Définir automatiquement les **exigences de gouvernance et de pilotage Qualité**
-* Fournir une base **objective, traçable et audit-proof** (ISO, audits clients, revues management)
+## Modèle par Axes Pondérés – Normalisation /45
 
 ---
 
-## 2. Principe général
+# 1️⃣ Contexte
+
+Dans un environnement multi-projets avec un nombre limité d’ingénieurs Qualité, il est nécessaire de :
+
+* Prioriser les projets selon leur **niveau réel de criticité**
+* Déterminer ceux nécessitant un **Ingénieur Qualité Projet dédié**
+* Adapter le **niveau de gouvernance**
+* Justifier les décisions en audit (ISO 9001, audits clients, management review)
+
+L’outil IQP permet une évaluation **structurée, objective et traçable**.
+
+---
+
+# 2️⃣ Principe Général
 
 L’évaluation repose sur :
 
-* **4 axes de risque**
-* **12 critères au total**
-* Une **pondération par axe**
-* Un calcul de criticité basé sur une **moyenne par axe**
-
-> **Criticité globale = Σ (Score Axe × Pondération)**
-
----
-
-## 3. Axes, critères et pondérations
-
-### 🔹 AXE 1 — Criticité stratégique (pondération 1,5)
-
-| Critère                       | Niveaux                           |
-| ----------------------------- | --------------------------------- |
-| Importance business           | 1=Faible · 2=Moyenne · 3=Critique |
-| Visibilité / impact image     | 1=Faible · 2=Moyenne · 3=Forte    |
-| Dépendance à d’autres projets | 1=Aucune · 2=Partielle · 3=Forte  |
+* ✅ 4 axes de criticité
+* ✅ 15 critères
+* ✅ Coefficients standardisés : **3 / 6 / 9**
+* ✅ Pondération par axe
+* ✅ Normalisation finale par division **/45**
 
 ---
 
-### 🔹 AXE 2 — Complexité technique (pondération 1,3)
-
-| Critère                  | Niveaux                                         |
-| ------------------------ | ----------------------------------------------- |
-| Complexité architecture  | 1=Faible · 2=Moyenne · 3=Forte                  |
-| Maturité technologique   | 1=Maîtrisée · 2=Partielle · 3=Faible / nouvelle |
-| Intégration / interfaces | 1=Simples · 2=Multiples · 3=Critiques           |
+# 3️⃣ Structure des Axes
 
 ---
 
-### 🔹 AXE 3 — Risque projet (pondération 1,2)
+## 🔹 AXE 1 — Criticité stratégique
 
-| Critère                | Niveaux                            |
-| ---------------------- | ---------------------------------- |
-| Risque planning        | 1=Faible · 2=Moyen · 3=Élevé       |
-| Risque coût            | 1=Faible · 2=Moyen · 3=Élevé       |
-| Contraintes normatives | 1=Aucune · 2=Standard · 3=Critique |
+**Pondération : ×1,5**
 
----
+Critères :
 
-### 🔹 AXE 4 — Risque organisationnel & client (pondération 1,0)
-
-| Critère                               | Niveaux                                          |
-| ------------------------------------- | ------------------------------------------------ |
-| Taille & dispersion équipe            | 1=Petite/stable · 2=Moyenne · 3=Large/distribuée |
-| Disponibilité client                  | 1=Forte · 2=Moyenne · 3=Faible                   |
-| Coopération / stabilité décisionnelle | 1=Coopératif · 2=Variable · 3=Résistant          |
+* Importance du marché
+* Visibilité / impact image
+* Dépendance à d’autres projets
 
 ---
 
-## 4. Méthode de calcul
+## 🔹 AXE 2 — Complexité technique
 
-### 4.1 Score par axe
+**Pondération : ×1,3**
+
+Critères :
+
+* Complexité architecture
+* Maturité technologique
+* Intégration / interfaces
+
+---
+
+## 🔹 AXE 3 — Risque projet
+
+**Pondération : ×1,2**
+
+Critères :
+
+* Risque planning
+* Risque coût
+* Contraintes normatives
+* Durée du projet
+
+---
+
+## 🔹 AXE 4 — Risque organisationnel & client
+
+**Pondération : ×1,0**
+
+Critères :
+
+* Taille & dispersion équipe
+* Nature du projet
+* Type du client
+* Disponibilité client
+* Coopération / stabilité décisionnelle
+
+---
+
+# 4️⃣ Méthode de Calcul (Version actuelle du code)
+
+---
+
+## 4.1 Score par axe
+
+Chaque critère est noté :
 
 ```
-Score Axe = (Somme des critères de l’axe) / 3
+3 = Faible
+6 = Moyen
+9 = Élevé / Critique
 ```
 
-👉 Valeur comprise entre **1 et 3**
-
-### 4.2 Criticité globale
+Le score d’un axe est :
 
 ```
-Criticité globale = Σ (Score Axe × Pondération Axe)
+Score Axe = Moyenne des coefficients de l’axe
 ```
 
-### 4.3 Plage de score
-
-* **Minimum** : 5,00
-* **Maximum** : 15,00
-
-Le score est affiché avec **2 décimales**.
+👉 Le score axe est donc compris entre **3 et 9**
 
 ---
 
-## 5. Mapping Criticité → Gouvernance
+## 4.2 Somme pondérée
 
-### Seuils de classification
-
-| Score global         | Niveau |
-| -------------------- | ------ |
-| < 8,33               | Faible |
-| 8,33 ≤ score < 11,67 | Moyen  |
-| ≥ 11,67              | Élevé  |
+```
+Somme pondérée = Σ (Score Axe × Pondération Axe)
+```
 
 ---
 
-### Gouvernance associée
+## 4.3 Normalisation globale
 
-| Niveau    | Classe projet   | Exigences associées                                                                      |
-| --------- | --------------- | ---------------------------------------------------------------------------------------- |
-| 🟢 Faible | Projet simple   | Pilotage standard, QA léger (en cas de besoins sur demande CDP / Manager ponctuellement) |
-| 🟠 Moyen  | Projet sensible | Jalons qualité, gestion des risques formalisée                                           |
-| 🔴 Élevé  | Projet critique | Gouvernance renforcée, validation indépendante, reporting comité                         |
+```
+Score Global = Somme pondérée / 45
+```
 
----
+Pourquoi 45 ?
 
-## 6. Résultats fournis par l’outil
+Parce que :
 
-L’outil génère automatiquement :
+* Maximum possible par axe = 9
+* Somme des pondérations = 1.5 + 1.3 + 1.2 + 1.0 = 5
+* Maximum pondéré = 9 × 5 = 45
 
-### 📌 Score global
+Donc :
 
-* Valeur numérique (ex : **10,25 / 15**)
-* Badge visuel (Vert / Orange / Rouge)
-
-### 📌 Classe projet & gouvernance
-
-* Projet simple / sensible / critique
-* Exigences associées affichées explicitement
-
-### 📌 Détail par axe
-
-* Score moyen par axe
-* Pondération appliquée
-* Contribution au score global
-
-### 📌 Points de vigilance
-
-* Liste automatique des **critères notés 3**
-* Regroupés par axe
-* Triés par niveau de risque
+```
+Score global ∈ [0.33 ; 1.00]
+```
 
 ---
 
-## 7. Fonctionnalités clés
+# 5️⃣ Interprétation du Score
 
-* ✅ Calcul **100 % automatique** (aucun bouton « Calculer »)
-* 🔄 Réinitialisation complète du formulaire
-* 📤 Export CSV (Excel-compatible) incluant :
+L’outil affiche :
 
-  * Infos projet
-  * Valeurs des 12 critères
-  * Scores par axe
-  * Score global
-  * Niveau de criticité
-  * Classe projet
-  * Gouvernance associée
-* 🖨️ Impression / export PDF
-* 📱 Responsive (PC, tablette, mobile)
+* Score normalisé (ex : 0,72)
+* Équivalent en pourcentage (~72%)
+* Gauge circulaire dynamique
+* Badge niveau K3 / K2 / K1
 
 ---
 
-## 8. Utilisation recommandée
+## 🔎 Seuils actuels (implémentés dans le code)
 
-1. Le chef de projet renseigne les critères
-2. Le score et la classe sont calculés automatiquement
-3. La gouvernance Qualité est définie
-4. La décision est :
-
-   * **Objective**
-   * **Traçable**
-   * **Justifiable en audit**
-
-👉 Mise à jour recommandée :
-
-* À chaque jalon projet majeur
-* Ou trimestriellement
+| Score normalisé | Niveau         |
+| --------------- | -------------- |
+| < 0.56          | 🟢 Faible (K3) |
+| 0.56 – 0.78     | 🟠 Moyen (K2)  |
+| ≥ 0.78          | 🔴 Élevé (K1)  |
 
 ---
 
-## 9. Bénéfices organisationnels
-
-✔ Harmonisation des pratiques de classification projet
-✔ Allocation des ressources Qualité basée sur le risque
-✔ Support à la décision pour le management
-✔ Vision claire du portefeuille projets
-✔ Alignement avec une approche **Risk-Based Governance**
+# 6️⃣ Mapping Gouvernance
 
 ---
 
-## 10. Limites & évolutions possibles
+## 🟢 Faible (K3)
 
-### Limites
+* Pas d’ingénieur qualité dédié
+* Support ponctuel si nécessaire
+* Suivi intégré aux réunions projet
+* Pas de jalon qualité dédié
 
-* Données déclaratives
-* Ne remplace pas l’expertise terrain
+---
 
-### Évolutions possibles
+## 🟠 Moyen (K2)
 
-* Connexion SharePoint / Forms
+* Ingénieur qualité requis
+* Taux d’affectation indicatif : 15–30%
+* Jalons qualité formalisés
+* QAP obligatoire
+* Suivi risques structuré
+* Reporting régulier
+
+---
+
+## 🔴 Élevé (K1)
+
+* Ingénieur qualité dédié (voire équipe)
+* Affectation possible 50–100%
+* Gouvernance renforcée
+* Audits internes projet
+* Reporting comité
+* Validation indépendante
+* Préparation audits externes
+
+---
+
+# 7️⃣ Fonctionnalités de l’Outil
+
+* 🔄 Calcul automatique temps réel
+* 📊 Gauge circulaire dynamique
+* 📌 Détail par axe
+* ⚠ Liste automatique des critères à 9
+* 📤 Export CSV complet
+* 🖨 Impression / export PDF
+* 📱 Responsive design
+* 🏷 Logo ACTIA intégré
+* 🎨 Interface moderne Tailwind CSS
+
+---
+
+# 8️⃣ Export CSV
+
+Le fichier exporté contient :
+
+* Date
+* Projet
+* Client
+* Chef de projet
+* BU
+* Les 15 critères (noms explicites)
+* Score axe 1 à 4
+* Somme pondérée
+* Score global normalisé
+* Score %
+* Niveau
+* Classe projet
+* Exigences associées
+
+Compatible Excel (séparateur `;` + BOM UTF-8).
+
+---
+
+# 9️⃣ Cas d’usage recommandé
+
+1. Chef de projet remplit l’évaluation
+2. Score calculé automatiquement
+3. Classification obtenue
+4. Décision d’affectation Qualité validée
+5. CSV archivé pour traçabilité
+
+Recommandé :
+
+* À l’initialisation projet
+* À chaque jalon majeur
+* En revue trimestrielle portefeuille
+
+---
+
+# 🔟 Bénéfices Organisationnels
+
+✔ Allocation intelligente des ressources Qualité
+✔ Décision basée sur le risque
+✔ Harmonisation inter-projets
+✔ Justification audit ISO / client
+✔ Vision portefeuille projets
+✔ Support management décisionnel
+
+---
+
+# 1️⃣1️⃣ Évolutions Futures
+
+* Intégration SharePoint Forms
 * Historique multi-projets
 * Dashboard portefeuille (Power BI)
-* Ajustement des pondérations par type de projet
+* Paramétrage dynamique des pondérations
+* Version SaaS interne
 
 ---
 
-## 11. Auteur
+# 1️⃣2️⃣ Auteur
 
 **Auteur :** Dhafer Bouthelja
+**Contexte :** Gouvernance Qualité Projets – ACTIA Engineering Services
 **Année :** 2026
-**Contexte :** Pilotage Qualité Projets – Gouvernance basée sur le risque
 
+---

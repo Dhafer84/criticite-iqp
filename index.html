@@ -2,13 +2,13 @@
 <html lang="fr" class="h-full">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Évaluation de criticité projet (IQP)</title>
     <script src="/_sdk/element_sdk.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             box-sizing: border-box;
@@ -36,6 +36,8 @@
 
         .gauge-circle {
             transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transform-box: fill-box;
         }
 
         .gauge-bg {
@@ -47,19 +49,20 @@
             transition: stroke-dashoffset 0.5s ease-out, stroke 0.3s ease;
         }
 
+
         select:focus {
             outline: 2px solid #3b82f6;
             outline-offset: 2px;
         }
 
         .fade-in {
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.25s ease-out;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(8px);
             }
 
             to {
@@ -67,11 +70,8 @@
                 transform: translateY(0);
             }
         }
-
-        .level-indicator {
-            transition: all 0.2s ease;
-        }
     </style>
+
     <style>
         @view-transition {
             navigation: auto;
@@ -82,479 +82,756 @@
 
 <body class="h-full bg-slate-50 text-slate-800 overflow-auto">
     <div class="w-full min-h-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
-        <div class="max-w-6xl mx-auto px-4 py-8"><!-- Header -->
+        <div class="max-w-6xl mx-auto px-4 py-8">
+
+            <!-- Header -->
             <header class="text-center mb-10">
-                <div class="inline-flex items-center gap-3 mb-4">
-                    <div
-                        class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                    </div>
+                <div class="mb-5 flex justify-center">
+                    <img src="assets/logo-actia.png" alt="ACTIA Engineering Services"
+                        class="mx-auto mb-6 h-20 md:h-28 w-auto object-contain" />
+
                 </div>
+
                 <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Évaluation de criticité
                     projet (IQP)</h1>
-                <p id="subtitle" class="text-lg text-slate-600">Scoring par axes pondérés – décision automatique</p>
+                <p id="subtitle" class="text-lg text-slate-600">Scoring par axes pondérés – coefficients 3/6/9</p>
             </header>
-            <div class="grid lg:grid-cols-3 gap-6"><!-- Left Column: Project Info & Axes -->
-                <div class="lg:col-span-2 space-y-6"><!-- Section A: Project Info -->
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Left Column -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Section A -->
                     <section class="card bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-                        <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2"><span
+                        <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <span
                                 class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-sm font-bold">A</span>
-                            Informations projet</h2>
+                            Informations projet
+                        </h2>
                         <div class="grid md:grid-cols-2 gap-4">
-                            <div><label for="project-name" class="block text-sm font-medium text-slate-700 mb-1">Nom du
-                                    projet</label> <input type="text" id="project-name"
+                            <div>
+                                <label for="project-name" class="block text-sm font-medium text-slate-700 mb-1">Nom du
+                                    projet</label>
+                                <input type="text" id="project-name"
                                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                    placeholder="Ex: CLSXXX">
+                                    placeholder="Ex: D2HUB" />
                             </div>
-                            <div><label for="client"
-                                    class="block text-sm font-medium text-slate-700 mb-1">Client</label> <input
-                                    type="text" id="client"
+                            <div>
+                                <label for="client" class="block text-sm font-medium text-slate-700 mb-1">Client</label>
+                                <input type="text" id="client"
                                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                    placeholder="Ex: AAS">
+                                    placeholder="Ex: ST / Client X" />
                             </div>
-                            <div><label for="project-manager" class="block text-sm font-medium text-slate-700 mb-1">Chef
-                                    de projet</label> <input type="text" id="project-manager"
+                            <div>
+                                <label for="project-manager" class="block text-sm font-medium text-slate-700 mb-1">Chef
+                                    de projet</label>
+                                <input type="text" id="project-manager"
                                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                    placeholder="Ex: xxxx xxxx">
+                                    placeholder="Ex: Prénom NOM" />
                             </div>
-                            <div><label for="bu" class="block text-sm font-medium text-slate-700 mb-1">BU /
-                                    Département</label> <input type="text" id="bu"
+                            <div>
+                                <label for="bu" class="block text-sm font-medium text-slate-700 mb-1">BU /
+                                    Département</label>
+                                <input type="text" id="bu"
                                     class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                    placeholder="Ex: INDUSTRY BU">
+                                    placeholder="Ex: INDUSTRY BU" />
                             </div>
                         </div>
-                    </section><!-- Section B: Evaluation Axes -->
+                    </section>
+
+                    <!-- Section B -->
                     <section class="card bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-                        <h2 class="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2"><span
+                        <h2 class="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
+                            <span
                                 class="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center text-sm font-bold">B</span>
-                            Évaluation par axes</h2>
-                        <div class="space-y-8" id="axes-container"><!-- AXE 1 -->
+                            Évaluation par axes (coefficients 3 / 6 / 9)
+                        </h2>
+
+                        <div class="space-y-8" id="axes-container">
+
+                            <!-- AXE 1 -->
                             <div class="axe-block" data-axe="1">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2"><span
+                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                                        <span
                                             class="w-6 h-6 bg-amber-100 text-amber-700 rounded-md flex items-center justify-center text-xs font-bold">1</span>
-                                        Criticité stratégique</h3><span
+                                        Criticité stratégique
+                                    </h3>
+                                    <span
                                         class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Pond.
                                         ×1,5</span>
                                 </div>
+
                                 <div class="grid md:grid-cols-3 gap-4">
-                                    <div class="criterion-card"><label for="c1-1"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Importance
-                                            business</label> <select id="c1-1" data-axe="1"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Faible</option>
-                                            <option value="2" selected>2 - Moyenne</option>
-                                            <option value="3">3 - Critique</option>
+                                    <div>
+                                        <label for="c1-1"
+                                            class="block text-sm font-medium text-slate-700 mb-1">Importance du
+                                            marché</label>
+                                        <select id="c1-1" data-axe="1"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Faible</option>
+                                            <option value="6" selected>6 - Moyenne</option>
+                                            <option value="9">9 - Critique</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Faible, 2=Moyenne, 3=Critique</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Faible, 6=Moyenne, 9=Critique</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c1-2"
+
+                                    <div>
+                                        <label for="c1-2"
                                             class="block text-sm font-medium text-slate-700 mb-1">Visibilité / impact
-                                            image</label> <select id="c1-2" data-axe="1"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Faible</option>
-                                            <option value="2" selected>2 - Moyenne</option>
-                                            <option value="3">3 - Forte</option>
+                                            image</label>
+                                        <select id="c1-2" data-axe="1"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Faible</option>
+                                            <option value="6" selected>6 - Moyenne</option>
+                                            <option value="9">9 - Forte</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Faible, 2=Moyenne, 3=Forte</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Faible, 6=Moyenne, 9=Forte</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c1-3"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Dépendance
-                                            projets</label> <select id="c1-3" data-axe="1"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Aucune</option>
-                                            <option value="2" selected>2 - Partielle</option>
-                                            <option value="3">3 - Forte</option>
+
+                                    <div>
+                                        <label for="c1-3"
+                                            class="block text-sm font-medium text-slate-700 mb-1">Dépendance à d’autres
+                                            projets</label>
+                                        <select id="c1-3" data-axe="1"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Aucune</option>
+                                            <option value="6" selected>6 - Partielle</option>
+                                            <option value="9">9 - Forte</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Aucune, 2=Partielle, 3=Forte</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Aucune, 6=Partielle, 9=Forte</p>
                                     </div>
                                 </div>
+
                                 <div class="mt-3 flex items-center gap-2">
                                     <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div id="axe1-bar" class="h-full bg-amber-500 transition-all duration-300"
                                             style="width: 50%"></div>
-                                    </div><span id="axe1-score"
-                                        class="text-sm font-semibold text-slate-600 w-16 text-right">2,00</span>
+                                    </div>
+                                    <span id="axe1-score"
+                                        class="text-sm font-semibold text-slate-600 w-16 text-right">6,00</span>
                                 </div>
-                            </div><!-- AXE 2 -->
+                            </div>
+
+                            <!-- AXE 2 -->
                             <div class="axe-block" data-axe="2">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2"><span
+                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                                        <span
                                             class="w-6 h-6 bg-blue-100 text-blue-700 rounded-md flex items-center justify-center text-xs font-bold">2</span>
-                                        Complexité technique</h3><span
+                                        Complexité technique
+                                    </h3>
+                                    <span
                                         class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Pond.
                                         ×1,3</span>
                                 </div>
+
                                 <div class="grid md:grid-cols-3 gap-4">
-                                    <div class="criterion-card"><label for="c2-1"
+                                    <div>
+                                        <label for="c2-1"
                                             class="block text-sm font-medium text-slate-700 mb-1">Complexité
-                                            architecture</label> <select id="c2-1" data-axe="2"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Faible</option>
-                                            <option value="2" selected>2 - Moyenne</option>
-                                            <option value="3">3 - Forte</option>
+                                            architecture</label>
+                                        <select id="c2-1" data-axe="2"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Faible</option>
+                                            <option value="6" selected>6 - Moyenne</option>
+                                            <option value="9">9 - Forte</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Faible, 2=Moyenne, 3=Forte</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Faible, 6=Moyenne, 9=Forte</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c2-2"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Maturité
-                                            technologique</label> <select id="c2-2" data-axe="2"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Maîtrisée</option>
-                                            <option value="2" selected>2 - Partielle</option>
-                                            <option value="3">3 - Faible/nouvelle</option>
+
+                                    <div>
+                                        <label for="c2-2" class="block text-sm font-medium text-slate-700 mb-1">Maturité
+                                            technologique</label>
+                                        <select id="c2-2" data-axe="2"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Maîtrisée</option>
+                                            <option value="6" selected>6 - Partielle</option>
+                                            <option value="9">9 - Faible / nouvelle</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Maîtrisée, 2=Partielle, 3=Faible</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Maîtrisée, 6=Partielle,
+                                            9=Faible/nouvelle</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c2-3"
+
+                                    <div>
+                                        <label for="c2-3"
                                             class="block text-sm font-medium text-slate-700 mb-1">Intégration /
-                                            interfaces</label> <select id="c2-3" data-axe="2"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Simples</option>
-                                            <option value="2" selected>2 - Multiples</option>
-                                            <option value="3">3 - Critiques</option>
+                                            interfaces</label>
+                                        <select id="c2-3" data-axe="2"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Simples</option>
+                                            <option value="6" selected>6 - Multiples</option>
+                                            <option value="9">9 - Critiques</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Simples, 2=Multiples, 3=Critiques</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Simples, 6=Multiples, 9=Critiques</p>
                                     </div>
                                 </div>
+
                                 <div class="mt-3 flex items-center gap-2">
                                     <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div id="axe2-bar" class="h-full bg-blue-500 transition-all duration-300"
                                             style="width: 50%"></div>
-                                    </div><span id="axe2-score"
-                                        class="text-sm font-semibold text-slate-600 w-16 text-right">2,00</span>
+                                    </div>
+                                    <span id="axe2-score"
+                                        class="text-sm font-semibold text-slate-600 w-16 text-right">6,00</span>
                                 </div>
-                            </div><!-- AXE 3 -->
+                            </div>
+
+                            <!-- AXE 3 -->
                             <div class="axe-block" data-axe="3">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2"><span
+                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                                        <span
                                             class="w-6 h-6 bg-rose-100 text-rose-700 rounded-md flex items-center justify-center text-xs font-bold">3</span>
-                                        Risque projet</h3><span
+                                        Risque projet
+                                    </h3>
+                                    <span
                                         class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Pond.
                                         ×1,2</span>
                                 </div>
-                                <div class="grid md:grid-cols-3 gap-4">
-                                    <div class="criterion-card"><label for="c3-1"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Risque
-                                            planning</label> <select id="c3-1" data-axe="3"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Faible</option>
-                                            <option value="2" selected>2 - Moyen</option>
-                                            <option value="3">3 - Élevé</option>
+
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="c3-1" class="block text-sm font-medium text-slate-700 mb-1">Risque
+                                            planning</label>
+                                        <select id="c3-1" data-axe="3"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Faible</option>
+                                            <option value="6" selected>6 - Moyen</option>
+                                            <option value="9">9 - Élevé</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Faible, 2=Moyen, 3=Élevé</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Faible, 6=Moyen, 9=Élevé</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c3-2"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Risque coût</label>
+
+                                    <div>
+                                        <label for="c3-2" class="block text-sm font-medium text-slate-700 mb-1">Risque
+                                            coût</label>
                                         <select id="c3-2" data-axe="3"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Faible</option>
-                                            <option value="2" selected>2 - Moyen</option>
-                                            <option value="3">3 - Élevé</option>
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Faible</option>
+                                            <option value="6" selected>6 - Moyen</option>
+                                            <option value="9">9 - Élevé</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Faible, 2=Moyen, 3=Élevé</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Faible, 6=Moyen, 9=Élevé</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c3-3"
+
+                                    <div>
+                                        <label for="c3-3"
                                             class="block text-sm font-medium text-slate-700 mb-1">Contraintes
-                                            normatives</label> <select id="c3-3" data-axe="3"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Aucune</option>
-                                            <option value="2" selected>2 - Standard</option>
-                                            <option value="3">3 - Critique</option>
+                                            normatives</label>
+                                        <select id="c3-3" data-axe="3"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Standard</option>
+                                            <option value="6" selected>6 - Moyen</option>
+                                            <option value="9">9 - Critique</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Aucune, 2=Standard, 3=Critique</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Standard, 6=Moyen, 9=Critique</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="c3-4" class="block text-sm font-medium text-slate-700 mb-1">Durée du
+                                            projet</label>
+                                        <select id="c3-4" data-axe="3"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - durée &lt; 1 an</option>
+                                            <option value="6" selected>6 - 1 &lt; durée ≤ 2 ans</option>
+                                            <option value="9">9 - durée &gt; 2 ans</option>
+                                        </select>
+                                        <p class="text-xs text-slate-500 mt-1">3=&lt;1 an, 6=1-2 ans, 9=&gt;2 ans</p>
                                     </div>
                                 </div>
+
                                 <div class="mt-3 flex items-center gap-2">
                                     <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div id="axe3-bar" class="h-full bg-rose-500 transition-all duration-300"
                                             style="width: 50%"></div>
-                                    </div><span id="axe3-score"
-                                        class="text-sm font-semibold text-slate-600 w-16 text-right">2,00</span>
+                                    </div>
+                                    <span id="axe3-score"
+                                        class="text-sm font-semibold text-slate-600 w-16 text-right">6,00</span>
                                 </div>
-                            </div><!-- AXE 4 -->
+                            </div>
+
+                            <!-- AXE 4 -->
                             <div class="axe-block" data-axe="4">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2"><span
+                                    <h3 class="font-semibold text-slate-800 flex items-center gap-2">
+                                        <span
                                             class="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-md flex items-center justify-center text-xs font-bold">4</span>
-                                        Risque organisationnel &amp; client</h3><span
+                                        Risque organisationnel & client
+                                    </h3>
+                                    <span
                                         class="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">Pond.
                                         ×1,0</span>
                                 </div>
-                                <div class="grid md:grid-cols-3 gap-4">
-                                    <div class="criterion-card"><label for="c4-1"
-                                            class="block text-sm font-medium text-slate-700 mb-1">Taille &amp;
-                                            dispersion équipe</label> <select id="c4-1" data-axe="4"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Petite/stable</option>
-                                            <option value="2" selected>2 - Moyenne</option>
-                                            <option value="3">3 - Large/distribuée</option>
+
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="c4-1" class="block text-sm font-medium text-slate-700 mb-1">Taille &
+                                            dispersion équipe</label>
+                                        <select id="c4-1" data-axe="4"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Petite / stable</option>
+                                            <option value="6" selected>6 - Moyenne</option>
+                                            <option value="9">9 - Large / distribuée</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Petite, 2=Moyenne, 3=Large</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Petite, 6=Moyenne, 9=Large/distribuée
+                                        </p>
                                     </div>
-                                    <div class="criterion-card"><label for="c4-2"
+
+                                    <div>
+                                        <label for="c4-2" class="block text-sm font-medium text-slate-700 mb-1">Nature
+                                            du projet</label>
+                                        <select id="c4-2" data-axe="4"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Mono métier</option>
+                                            <option value="6" selected>6 - Multimétier 2-3</option>
+                                            <option value="9">9 - Multimétier &gt; 3</option>
+                                        </select>
+                                        <p class="text-xs text-slate-500 mt-1">3=Mono, 6=Multi 2-3, 9=Multi &gt;3</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="c4-3" class="block text-sm font-medium text-slate-700 mb-1">Type du
+                                            client</label>
+                                        <select id="c4-3" data-axe="4"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Intra groupe</option>
+                                            <option value="6" selected>6 - Extra groupe (ancien client)</option>
+                                            <option value="9">9 - Extra groupe (nouveau client)</option>
+                                        </select>
+                                        <p class="text-xs text-slate-500 mt-1">3=Intra, 6=Extra ancien, 9=Extra nouveau
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label for="c4-4"
                                             class="block text-sm font-medium text-slate-700 mb-1">Disponibilité
-                                            client</label> <select id="c4-2" data-axe="4"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Forte</option>
-                                            <option value="2" selected>2 - Moyenne</option>
-                                            <option value="3">3 - Faible</option>
+                                            client</label>
+                                        <select id="c4-4" data-axe="4"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Forte</option>
+                                            <option value="6" selected>6 - Moyenne</option>
+                                            <option value="9">9 - Faible</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Forte, 2=Moyenne, 3=Faible</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Forte, 6=Moyenne, 9=Faible</p>
                                     </div>
-                                    <div class="criterion-card"><label for="c4-3"
+
+                                    <div class="md:col-span-2">
+                                        <label for="c4-5"
                                             class="block text-sm font-medium text-slate-700 mb-1">Coopération /
-                                            stabilité</label> <select id="c4-3" data-axe="4"
-                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="1">1 - Coopératif</option>
-                                            <option value="2" selected>2 - Variable</option>
-                                            <option value="3">3 - Résistant</option>
+                                            stabilité décisionnelle</label>
+                                        <select id="c4-5" data-axe="4"
+                                            class="criterion-select w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                            <option value="3">3 - Coopératif</option>
+                                            <option value="6" selected>6 - Variable</option>
+                                            <option value="9">9 - Résistant</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">1=Coopératif, 2=Variable, 3=Résistant</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Coopératif, 6=Variable, 9=Résistant</p>
                                     </div>
                                 </div>
+
                                 <div class="mt-3 flex items-center gap-2">
                                     <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div id="axe4-bar" class="h-full bg-emerald-500 transition-all duration-300"
                                             style="width: 50%"></div>
-                                    </div><span id="axe4-score"
-                                        class="text-sm font-semibold text-slate-600 w-16 text-right">2,00</span>
+                                    </div>
+                                    <span id="axe4-score"
+                                        class="text-sm font-semibold text-slate-600 w-16 text-right">6,00</span>
                                 </div>
                             </div>
+
                         </div>
-                    </section><!-- Mapping Table -->
+                    </section>
+
+                    <!-- Mapping Table -->
                     <section class="card bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
                         <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg> Correspondance Criticité → Gouvernance
+                            </svg>
+                            Mapping Criticité → Gouvernance
                         </h2>
+
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead>
                                     <tr class="border-b border-slate-200">
-                                        <th class="text-left py-3 px-2 font-semibold text-slate-700">Score</th>
+                                        <th class="text-left py-3 px-2 font-semibold text-slate-700">Score global</th>
                                         <th class="text-left py-3 px-2 font-semibold text-slate-700">Classe projet</th>
-                                        <th class="text-left py-3 px-2 font-semibold text-slate-700">Exigences</th>
+                                        <th class="text-left py-3 px-2 font-semibold text-slate-700">Exigences associées
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr id="row-faible" class="border-b border-slate-100 transition-colors">
-                                        <td class="py-3 px-2"><span
-                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Faible<br><span
-                                                    class="text-[10px] opacity-75">&lt; 8,33</span></span></td>
-                                        <td class="py-3 px-2 font-medium text-slate-700">Projet simple</td>
+                                        <td class="py-3 px-2">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Faible</span>
+                                        </td>
+                                        <td class="py-3 px-2 font-medium text-slate-700">Projet simple K3</td>
                                         <td class="py-3 px-2 text-slate-600">Pilotage standard, QA léger (sur demande
-                                            CDP/Manager)</td>
+                                            CDP/Manager ponctuellement)</td>
                                     </tr>
                                     <tr id="row-moyen" class="border-b border-slate-100 transition-colors">
-                                        <td class="py-3 px-2"><span
-                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Moyen<br><span
-                                                    class="text-[10px] opacity-75">8,33 - 11,66</span></span></td>
-                                        <td class="py-3 px-2 font-medium text-slate-700">Projet sensible</td>
+                                        <td class="py-3 px-2">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Moyen</span>
+                                        </td>
+                                        <td class="py-3 px-2 font-medium text-slate-700">Projet sensible K2</td>
                                         <td class="py-3 px-2 text-slate-600">Jalons qualité, gestion risques formalisée
                                         </td>
                                     </tr>
                                     <tr id="row-eleve" class="transition-colors">
-                                        <td class="py-3 px-2"><span
-                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Élevé<br><span
-                                                    class="text-[10px] opacity-75">≥ 11,67</span></span></td>
-                                        <td class="py-3 px-2 font-medium text-slate-700">Projet critique</td>
+                                        <td class="py-3 px-2">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Élevé</span>
+                                        </td>
+                                        <td class="py-3 px-2 font-medium text-slate-700">Projet critique K1</td>
                                         <td class="py-3 px-2 text-slate-600">Gouvernance renforcée, validation
                                             indépendante, reporting comité</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+
+                        <p class="mt-4 text-xs text-slate-500">
+                            Formule : <span class="font-semibold">Criticité globale = Σ(Score Axe × Pondération) /
+                                45</span>
+                            — Score axe basé sur la moyenne des coefficients (3/6/9).
+                        </p>
                     </section>
-                </div><!-- Right Column: Results Panel -->
-                <div class="space-y-6"><!-- Score Gauge -->
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
                     <section class="card bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 sticky top-4">
                         <h2 class="text-lg font-semibold text-slate-800 mb-6 text-center">Score global</h2>
+
                         <!-- Circular Gauge -->
                         <div class="relative flex justify-center mb-6">
-                            <svg class="w-48 h-48" viewbox="0 0 120 120">
+                            <svg class="w-48 h-48" viewBox="0 0 120 120">
                                 <circle class="gauge-bg" cx="60" cy="60" r="52" fill="none" stroke-width="10" />
                                 <circle id="gauge-circle" class="gauge-circle gauge-fill" cx="60" cy="60" r="52"
                                     fill="none" stroke-width="10" stroke="#f59e0b" stroke-dasharray="327"
                                     stroke-dashoffset="163" />
                             </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center"><span
-                                    id="score-display" class="text-4xl font-bold text-slate-800">10,00</span> <span
-                                    class="text-sm text-slate-500">/ 15</span>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="score-display" class="text-4xl font-bold text-slate-800">0,67</span>
+                                <span id="score-sub" class="text-sm text-slate-500">Score normalisé (×100 = %)</span>
                             </div>
-                        </div><!-- Level Badge -->
-                        <div id="level-badge" class="text-center mb-6"><span
+                        </div>
+
+                        <!-- Level Badge -->
+                        <div id="level-badge" class="text-center mb-6">
+                            <span
                                 class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-semibold bg-amber-100 text-amber-800 transition-all">
-                                <span id="level-icon">⚡</span> <span id="level-text">Moyen</span> </span>
-                        </div><!-- Project Class -->
+                                <span id="level-icon">⚡</span>
+                                <span id="level-text">Moyen (K2)</span>
+                            </span>
+                        </div>
+
+                        <!-- Project Class -->
                         <div class="bg-slate-50 rounded-xl p-4 mb-4">
                             <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Classe projet</p>
-                            <p id="project-class" class="font-semibold text-slate-800">Projet sensible</p>
-                        </div><!-- Requirements -->
+                            <p id="project-class" class="font-semibold text-slate-800">Projet sensible K2</p>
+                        </div>
+
+                        <!-- Requirements -->
                         <div class="bg-slate-50 rounded-xl p-4 mb-6">
                             <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Exigences</p>
                             <p id="requirements" class="text-sm text-slate-700">Jalons qualité, gestion risques
                                 formalisée</p>
-                        </div><!-- Axis Breakdown -->
+                            <div id="requirements-details" class="mt-3 text-sm text-slate-700"></div>
+                        </div>
+
+                        <!-- Axis Breakdown -->
                         <div class="space-y-3">
                             <p class="text-xs text-slate-500 uppercase tracking-wider">Détail par axe</p>
                             <div class="space-y-2 text-sm">
-                                <div class="flex justify-between items-center p-2 bg-amber-50 rounded-lg"><span
-                                        class="text-slate-700">Axe 1 (×1,5)</span> <span id="axe1-contrib"
-                                        class="font-semibold text-amber-700">3,00</span>
+                                <div class="flex justify-between items-center p-2 bg-amber-50 rounded-lg">
+                                    <span class="text-slate-700">Axe 1 (×1,5)</span>
+                                    <span id="axe1-contrib" class="font-semibold text-amber-700">9,00</span>
                                 </div>
-                                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg"><span
-                                        class="text-slate-700">Axe 2 (×1,3)</span> <span id="axe2-contrib"
-                                        class="font-semibold text-blue-700">2,60</span>
+                                <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
+                                    <span class="text-slate-700">Axe 2 (×1,3)</span>
+                                    <span id="axe2-contrib" class="font-semibold text-blue-700">7,80</span>
                                 </div>
-                                <div class="flex justify-between items-center p-2 bg-rose-50 rounded-lg"><span
-                                        class="text-slate-700">Axe 3 (×1,2)</span> <span id="axe3-contrib"
-                                        class="font-semibold text-rose-700">2,40</span>
+                                <div class="flex justify-between items-center p-2 bg-rose-50 rounded-lg">
+                                    <span class="text-slate-700">Axe 3 (×1,2)</span>
+                                    <span id="axe3-contrib" class="font-semibold text-rose-700">7,20</span>
                                 </div>
-                                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg"><span
-                                        class="text-slate-700">Axe 4 (×1,0)</span> <span id="axe4-contrib"
-                                        class="font-semibold text-emerald-700">2,00</span>
+                                <div class="flex justify-between items-center p-2 bg-emerald-50 rounded-lg">
+                                    <span class="text-slate-700">Axe 4 (×1,0)</span>
+                                    <span id="axe4-contrib" class="font-semibold text-emerald-700">6,00</span>
                                 </div>
                             </div>
+                            <p class="text-xs text-slate-500 mt-2">
+                                Note : contribution = (score axe moyen 3..9) × pondération.
+                            </p>
                         </div>
-                    </section><!-- Vigilance Points -->
+                    </section>
+
+                    <!-- Vigilance -->
                     <section class="card bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
                         <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg> Points de vigilance
+                            </svg>
+                            Points de vigilance (critères = 9)
                         </h2>
                         <div id="vigilance-list" class="space-y-2">
-                            <p class="text-sm text-slate-500 italic">Aucun critère au niveau maximal (3)</p>
+                            <p class="text-sm text-slate-500 italic">Aucun critère au niveau critique (9)</p>
                         </div>
                     </section>
                 </div>
-            </div><!-- Action Buttons -->
-            <div class="flex flex-wrap justify-center gap-4 mt-8 no-print"><button id="btn-reset"
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mt-8 no-print">
+                <button id="btn-reset"
                     class="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium rounded-xl transition-all shadow-sm hover:shadow">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg> Réinitialiser </button> <button id="btn-csv"
+                    </svg>
+                    Réinitialiser
+                </button>
+
+                <button id="btn-csv"
                     class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg> Exporter CSV </button> <button id="btn-print"
+                    </svg>
+                    Exporter CSV
+                </button>
+
+                <button id="btn-print"
                     class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg> Imprimer / PDF </button>
-            </div><!-- Footer -->
+                    </svg>
+                    Imprimer / PDF
+                </button>
+            </div>
+
             <footer class="text-center mt-10 text-sm text-slate-500">
                 <p>Outil IQP – Évaluation de criticité projet © 2026_QUALITY UNIT</p>
             </footer>
+
         </div>
     </div>
+
     <script>
         // Configuration
         const defaultConfig = {
             main_title: "Évaluation de criticité projet (IQP)",
-            subtitle: "Scoring par axes pondérés – décision automatique"
+            subtitle: "Scoring par axes pondérés – coefficients 3/6/9"
         };
 
-        // Axes configuration
+        // Axes config
         const AXES_CONFIG = {
             1: { weight: 1.5, color: '#f59e0b', name: 'Criticité stratégique' },
             2: { weight: 1.3, color: '#3b82f6', name: 'Complexité technique' },
             3: { weight: 1.2, color: '#f43f5e', name: 'Risque projet' },
-            4: { weight: 1.0, color: '#10b981', name: 'Risque organisationnel' }
+            4: { weight: 1.0, color: '#10b981', name: 'Risque organisationnel & client' }
         };
 
-        // Criteria labels for vigilance points
+        // IMPORTANT: Score axe = moyenne des coefficients (3/6/9)
+        const AXE_MIN = 3;
+        const AXE_MAX = 9;
+
+        // Denominator from your rule: /45
+        const GLOBAL_DENOMINATOR = 45;
+
+        // Labels for vigilance points (criteria at 9)
         const CRITERIA_LABELS = {
-            'c1-1': 'Importance business',
+            // Axe 1
+            'c1-1': 'Importance du marché',
             'c1-2': 'Visibilité / impact image',
-            'c1-3': 'Dépendance projets',
+            'c1-3': 'Dépendance à d’autres projets',
+            // Axe 2
             'c2-1': 'Complexité architecture',
             'c2-2': 'Maturité technologique',
             'c2-3': 'Intégration / interfaces',
+            // Axe 3
             'c3-1': 'Risque planning',
             'c3-2': 'Risque coût',
             'c3-3': 'Contraintes normatives',
+            'c3-4': 'Durée du projet',
+            // Axe 4
             'c4-1': 'Taille & dispersion équipe',
-            'c4-2': 'Disponibilité client',
-            'c4-3': 'Coopération / stabilité'
+            'c4-2': 'Nature du projet',
+            'c4-3': 'Type du client',
+            'c4-4': 'Disponibilité client',
+            'c4-5': 'Coopération / stabilité décisionnelle'
         };
 
-        // Governance mapping
+        // Governance mapping (K3/K2/K1) + details from your tables
         const GOVERNANCE = {
             faible: {
-                class: 'Projet simple',
-                requirements: 'Pilotage standard, QA léger (sur demande CDP/Manager ponctuellement)',
-                icon: '✓',
+                levelText: 'Faible (K3)',
+                class: 'Projet simple K3',
+                short: 'Pilotage standard, QA léger (sur demande CDP/Manager ponctuellement)',
+                icon: '✖',
                 bgClass: 'bg-emerald-100',
                 textClass: 'text-emerald-800',
-                gaugeColor: '#10b981'
+                gaugeColor: '#10b981',
+                detailsHtml: `
+        <div class="mt-2 text-sm">
+          <p><span class="font-semibold">Objectif :</span> Assurer un niveau minimum de conformité sans surcharger le projet.</p>
+          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Non requis</p>
+          <p><span class="font-semibold">Responsable qualité :</span> Chef de projet</p>
+          <p><span class="font-semibold">Taux d’affectation qualité :</span> 0%</p>
+          <p class="mt-2 font-semibold">Activités qualité</p>
+          <ul class="list-disc ml-5">
+            <li>Utilisation des templates et des process standards</li>
+            <li>Contrôle des livrables par le chef de projet / support technique assuré par Team Lead</li>
+            <li>Tâches qualité spécifiques sur demande (réclamation client, revue documentaire…)</li>
+          </ul>
+          <p class="mt-2 font-semibold">Livrables qualité</p>
+          <ul class="list-disc ml-5">
+            <li>Livrables projet validés par le chef de projet</li>
+          </ul>
+          <p class="mt-2 font-semibold">Gouvernance</p>
+          <ul class="list-disc ml-5">
+            <li>Pas de jalon qualité dédié</li>
+            <li>Suivi intégré aux réunions projet</li>
+          </ul>
+        </div>
+      `
             },
             moyen: {
-                class: 'Projet sensible',
-                requirements: 'Jalons qualité, gestion risques formalisée',
-                icon: '⚡',
+                levelText: 'Moyen (K2)',
+                class: 'Projet sensible K2',
+                short: 'Jalons qualité, gestion risques formalisée',
+                icon: '✅',
                 bgClass: 'bg-amber-100',
                 textClass: 'text-amber-800',
-                gaugeColor: '#f59e0b'
+                gaugeColor: '#f59e0b',
+                detailsHtml: `
+        <div class="mt-2 text-sm">
+          <p><span class="font-semibold">Objectif :</span> Maîtriser les risques projet et garantir la conformité des livrables.</p>
+          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Requis (dédié au projet)</p>
+          <p><span class="font-semibold">Taux d’affectation qualité :</span> 15% à 30% (à titre d’exemple)</p>
+          <p class="mt-2 font-semibold">Activités qualité</p>
+          <ul class="list-disc ml-5">
+            <li>Élaboration du Quality Assurance Plan (QAP)</li>
+            <li>Préparation, planification et animation des revues qualité (jalons)</li>
+            <li>Revue qualité des livrables selon critères d’acceptation prédéfinis</li>
+            <li>Vérification de l’application du process : audits internes projet</li>
+            <li>Suivi formalisé des risques</li>
+            <li>Pilotage des actions correctives et préventives</li>
+            <li>Gestion des NC internes, alertes et réclamations client</li>
+            <li>Calcul KPI projet et reporting</li>
+            <li>Escalation des problèmes au bon niveau</li>
+          </ul>
+          <p class="mt-2 font-semibold">Livrables qualité</p>
+          <ul class="list-disc ml-5">
+            <li>QAP validé</li>
+            <li>Rapports d’audit interne / revues de jalons</li>
+            <li>Tableau de suivi actions qualité</li>
+            <li>TDB Projet</li>
+          </ul>
+          <p class="mt-2 font-semibold">Gouvernance</p>
+          <ul class="list-disc ml-5">
+            <li>Jalons qualité formalisés</li>
+            <li>Reporting qualité régulier</li>
+          </ul>
+        </div>
+      `
             },
             eleve: {
-                class: 'Projet critique',
-                requirements: 'Gouvernance renforcée, validation indépendante, reporting comité',
+                levelText: 'Élevé (K1)',
+                class: 'Projet critique K1',
+                short: 'Gouvernance renforcée, validation indépendante, reporting comité',
                 icon: '⚠️',
                 bgClass: 'bg-rose-100',
                 textClass: 'text-rose-800',
-                gaugeColor: '#f43f5e'
+                gaugeColor: '#f43f5e',
+                detailsHtml: `
+        <div class="mt-2 text-sm">
+          <p><span class="font-semibold">Objectif :</span> Sécuriser un projet à fort enjeu par une gouvernance qualité renforcée et indépendante.</p>
+          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Requis (dédié, voire équipe qualité)</p>
+          <p><span class="font-semibold">Taux d’affectation qualité :</span> 50% à 100% (à titre d’exemple)</p>
+          <p class="mt-2 font-semibold">Activités qualité</p>
+          <ul class="list-disc ml-5">
+            <li>Élaboration du Quality Assurance Plan (QAP)</li>
+            <li>Préparation, planification et animation des revues qualité (jalons)</li>
+            <li>Revue qualité des livrables selon critères d’acceptation prédéfinis</li>
+            <li>Audits internes projet (conformité process)</li>
+            <li>Suivi formalisé des risques</li>
+            <li>Pilotage actions correctives et préventives</li>
+            <li>Gestion NC internes, alertes et réclamations client</li>
+            <li>Calcul KPI projet et reporting</li>
+            <li>Escalation des problèmes au niveau approprié</li>
+            <li>Supervision continue conformité processus</li>
+            <li>Préparation & accompagnement audits externes</li>
+            <li>Autres activités selon spécificité projet</li>
+          </ul>
+          <p class="mt-2 font-semibold">Livrables qualité</p>
+          <ul class="list-disc ml-5">
+            <li>QAP</li>
+            <li>Rapports d’audit indépendants</li>
+            <li>TDB Projet</li>
+            <li>Dossier qualité complet et traçable</li>
+            <li>Gestion alertes et réclamations client</li>
+          </ul>
+          <p class="mt-2 font-semibold">Gouvernance</p>
+          <ul class="list-disc ml-5">
+            <li>Jalons qualité formalisés</li>
+            <li>Reporting qualité régulier</li>
+          </ul>
+        </div>
+      `
             }
         };
 
-        // Calculate scores
+        // ---- Calcul ----
         function calculateScores() {
             const axeScores = {};
 
             for (let axe = 1; axe <= 4; axe++) {
                 const selects = document.querySelectorAll(`select[data-axe="${axe}"]`);
                 let sum = 0;
-                selects.forEach(select => {
-                    sum += parseInt(select.value);
-                });
+                selects.forEach(s => sum += parseInt(s.value, 10));
+                // Score axe = moyenne coefficients (3..9)
                 axeScores[axe] = sum / selects.length;
             }
 
-            // Calculate weighted global score
-            let globalScore = 0;
+            // Σ(ScoreAxe × Pondération)
+            let weightedSum = 0;
             for (let axe = 1; axe <= 4; axe++) {
-                globalScore += axeScores[axe] * AXES_CONFIG[axe].weight;
+                weightedSum += axeScores[axe] * AXES_CONFIG[axe].weight;
             }
 
-            return { axeScores, globalScore };
+            // Criticité globale = weightedSum / 45  (rule from your sheet)
+            const globalScore = weightedSum / GLOBAL_DENOMINATOR;
+
+            return { axeScores, weightedSum, globalScore };
         }
 
-        // Determine criticality level
-        function getCriticalityLevel(score) {
-            if (score < 8.33) return 'faible';
-            if (score < 11.67) return 'moyen';
+        // Thresholds (safe default): 3 levels between min and max
+        // Min possible weightedSum = 3 * (1.5+1.3+1.2+1) = 15 → /45 = 0.333
+        // Max possible weightedSum = 9 * (1.5+1.3+1.2+1) = 45 → /45 = 1.000
+        // Split into 3 equal bands: [0.333..0.555], [0.555..0.777], [0.777..1]
+        function getCriticalityLevel(score01) {
+            if (score01 < 0.56) return 'faible';
+            if (score01 < 0.78) return 'moyen';
             return 'eleve';
         }
 
-        // Get vigilance points (criteria at level 3)
         function getVigilancePoints() {
             const points = [];
             document.querySelectorAll('.criterion-select').forEach(select => {
-                if (parseInt(select.value) === 3) {
+                if (parseInt(select.value, 10) === 9) {
                     const axe = select.getAttribute('data-axe');
                     points.push({
                         id: select.id,
-                        label: CRITERIA_LABELS[select.id],
+                        label: CRITERIA_LABELS[select.id] || select.id,
                         axeName: AXES_CONFIG[axe].name,
                         axe: axe
                     });
@@ -563,94 +840,92 @@
             return points;
         }
 
-        // Update UI
         function updateUI() {
-            const { axeScores, globalScore } = calculateScores();
+            const { axeScores, weightedSum, globalScore } = calculateScores();
             const level = getCriticalityLevel(globalScore);
-            const governance = GOVERNANCE[level];
+            const gov = GOVERNANCE[level];
             const vigilancePoints = getVigilancePoints();
 
-            // Update score display
+            // Score display: normalized 0..1 and percent
             document.getElementById('score-display').textContent = globalScore.toFixed(2).replace('.', ',');
+            document.getElementById('score-sub').textContent = `Score normalisé (≈ ${(globalScore * 100).toFixed(0)}%) — Σ pondéré / 45`;
 
-            // Update gauge
+            // Gauge: map score from 0.333..1 to [0..1]
             const gaugeCircle = document.getElementById('gauge-circle');
             const circumference = 2 * Math.PI * 52; // r=52
-            const progress = (globalScore - 5) / 10; // 5 to 15 range normalized
+            const min = 0.333, max = 1.0;
+            const progress = Math.max(0, Math.min(1, (globalScore - min) / (max - min)));
             const offset = circumference * (1 - progress);
             gaugeCircle.style.strokeDashoffset = offset;
-            gaugeCircle.style.stroke = governance.gaugeColor;
+            gaugeCircle.style.stroke = gov.gaugeColor;
 
-            // Update level badge
-            const levelBadge = document.getElementById('level-badge').querySelector('span');
-            levelBadge.className = `inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-semibold ${governance.bgClass} ${governance.textClass} transition-all`;
-            document.getElementById('level-icon').textContent = governance.icon;
-            document.getElementById('level-text').textContent = level === 'faible' ? 'Faible' : level === 'moyen' ? 'Moyen' : 'Élevé';
+            // Badge
+            const badge = document.getElementById('level-badge').querySelector('span');
+            badge.className = `inline-flex items-center gap-2 px-4 py-2 rounded-full text-lg font-semibold ${gov.bgClass} ${gov.textClass} transition-all`;
+            document.getElementById('level-icon').textContent = gov.icon;
+            document.getElementById('level-text').textContent = gov.levelText;
 
-            // Update project class and requirements
-            document.getElementById('project-class').textContent = governance.class;
-            document.getElementById('requirements').textContent = governance.requirements;
+            // Class + requirements
+            document.getElementById('project-class').textContent = gov.class;
+            document.getElementById('requirements').textContent = gov.short;
+            document.getElementById('requirements-details').innerHTML = gov.detailsHtml;
 
-            // Update axis scores and bars
+            // Axis scores and bars + contributions
             for (let axe = 1; axe <= 4; axe++) {
-                const score = axeScores[axe];
-                const contribution = score * AXES_CONFIG[axe].weight;
-                const barPercent = ((score - 1) / 2) * 100;
+                const score = axeScores[axe]; // 3..9
+                const contribution = score * AXES_CONFIG[axe].weight; // in same unit (3..9)*w
+                const barPercent = ((score - AXE_MIN) / (AXE_MAX - AXE_MIN)) * 100;
 
-                document.getElementById(`axe${axe}-score`).textContent = score.toFixed(2).replace('.', ',');
-                document.getElementById(`axe${axe}-bar`).style.width = `${barPercent}%`;
-                document.getElementById(`axe${axe}-contrib`).textContent = contribution.toFixed(2).replace('.', ',');
+                const scoreEl = document.getElementById(`axe${axe}-score`);
+                if (scoreEl) scoreEl.textContent = score.toFixed(2).replace('.', ',');
+
+                const barEl = document.getElementById(`axe${axe}-bar`);
+                if (barEl) barEl.style.width = `${barPercent}%`;
+
+                const contribEl = document.getElementById(`axe${axe}-contrib`);
+                if (contribEl) contribEl.textContent = contribution.toFixed(2).replace('.', ',');
             }
 
-            // Update table row highlighting
+            // Highlight mapping row
             ['faible', 'moyen', 'eleve'].forEach(lvl => {
                 const row = document.getElementById(`row-${lvl}`);
-                if (lvl === level) {
-                    row.classList.add('bg-slate-100');
-                } else {
-                    row.classList.remove('bg-slate-100');
-                }
+                if (!row) return;
+                if (lvl === level) row.classList.add('bg-slate-100');
+                else row.classList.remove('bg-slate-100');
             });
 
-            // Update vigilance points
+            // Vigilance list (value=9)
             const vigilanceList = document.getElementById('vigilance-list');
             if (vigilancePoints.length === 0) {
-                vigilanceList.innerHTML = '<p class="text-sm text-slate-500 italic">Aucun critère au niveau maximal (3)</p>';
+                vigilanceList.innerHTML = '<p class="text-sm text-slate-500 italic">Aucun critère au niveau critique (9)</p>';
             } else {
-                vigilanceList.innerHTML = vigilancePoints.map(point => `
-          <div class="flex items-start gap-2 p-2 bg-rose-50 rounded-lg fade-in">
-            <span class="text-rose-500 mt-0.5">⚠</span>
-            <div>
-              <p class="text-sm font-medium text-rose-800">${point.label}</p>
-              <p class="text-xs text-rose-600">${point.axeName}</p>
-            </div>
+                vigilanceList.innerHTML = vigilancePoints.map(p => `
+        <div class="flex items-start gap-2 p-2 bg-rose-50 rounded-lg fade-in">
+          <span class="text-rose-500 mt-0.5">⚠</span>
+          <div>
+            <p class="text-sm font-medium text-rose-800">${p.label}</p>
+            <p class="text-xs text-rose-600">${p.axeName}</p>
           </div>
-        `).join('');
+        </div>
+      `).join('');
             }
         }
 
-        // Reset form
         function resetForm() {
-            // Clear project info
             document.getElementById('project-name').value = '';
             document.getElementById('client').value = '';
             document.getElementById('project-manager').value = '';
             document.getElementById('bu').value = '';
 
-            // Reset all selects to 2
-            document.querySelectorAll('.criterion-select').forEach(select => {
-                select.value = '2';
-            });
-
+            // Default to 6 (Moyen)
+            document.querySelectorAll('.criterion-select').forEach(select => select.value = '6');
             updateUI();
         }
 
-        // Export to CSV
         function exportCSV() {
-            const { axeScores, globalScore } = calculateScores();
+            const { axeScores, weightedSum, globalScore } = calculateScores();
             const level = getCriticalityLevel(globalScore);
-            const governance = GOVERNANCE[level];
-            const levelText = level === 'faible' ? 'Faible' : level === 'moyen' ? 'Moyen' : 'Élevé';
+            const gov = GOVERNANCE[level];
 
             const date = new Date().toISOString().split('T')[0];
             const projectName = document.getElementById('project-name').value || 'Non renseigné';
@@ -658,31 +933,55 @@
             const projectManager = document.getElementById('project-manager').value || 'Non renseigné';
             const bu = document.getElementById('bu').value || 'Non renseigné';
 
-            // Get all criteria values
-            const criteriaValues = [];
-            document.querySelectorAll('.criterion-select').forEach(select => {
-                criteriaValues.push(select.value);
-            });
+            // Ordre des critères (doit matcher les IDs du formulaire)
+            const criteria = [
+                { id: 'c1-1', col: 'Axe1_CriticiteStrategique_ImportanceDuMarche' },
+                { id: 'c1-2', col: 'Axe1_CriticiteStrategique_VisibiliteImpactImage' },
+                { id: 'c1-3', col: 'Axe1_CriticiteStrategique_DependanceAutresProjets' },
 
-            // Build CSV
-            const headers = [
-                'Date', 'Projet', 'Client', 'Chef de projet', 'BU',
-                'C1-1', 'C1-2', 'C1-3', 'C2-1', 'C2-2', 'C2-3',
-                'C3-1', 'C3-2', 'C3-3', 'C4-1', 'C4-2', 'C4-3',
-                'Score Axe 1', 'Score Axe 2', 'Score Axe 3', 'Score Axe 4',
-                'Score Global', 'Niveau', 'Classe Projet', 'Exigences'
+                { id: 'c2-1', col: 'Axe2_ComplexiteTechnique_ComplexiteArchitecture' },
+                { id: 'c2-2', col: 'Axe2_ComplexiteTechnique_MaturiteTechnologique' },
+                { id: 'c2-3', col: 'Axe2_ComplexiteTechnique_IntegrationInterfaces' },
+
+                { id: 'c3-1', col: 'Axe3_RisqueProjet_RisquePlanning' },
+                { id: 'c3-2', col: 'Axe3_RisqueProjet_RisqueCout' },
+                { id: 'c3-3', col: 'Axe3_RisqueProjet_ContraintesNormatives' },
+                { id: 'c3-4', col: 'Axe3_RisqueProjet_DureeDuProjet' },
+
+                { id: 'c4-1', col: 'Axe4_RisqueOrgClient_TailleDispersionEquipe' },
+                { id: 'c4-2', col: 'Axe4_RisqueOrgClient_NatureDuProjet' },
+                { id: 'c4-3', col: 'Axe4_RisqueOrgClient_TypeDuClient' },
+                { id: 'c4-4', col: 'Axe4_RisqueOrgClient_DisponibiliteClient' },
+                { id: 'c4-5', col: 'Axe4_RisqueOrgClient_CooperationStabiliteDecisionnelle' }
             ];
 
-            const values = [
+            const criteriaValues = criteria.map(c => {
+                const el = document.getElementById(c.id);
+                return el ? el.value : '';
+            });
+
+            const headers = [
+                'Date', 'Projet', 'Client', 'ChefDeProjet', 'BU',
+                ...criteria.map(c => c.col),
+                'ScoreAxe1_MoyenneCoeff', 'ScoreAxe2_MoyenneCoeff', 'ScoreAxe3_MoyenneCoeff', 'ScoreAxe4_MoyenneCoeff',
+                'SommePonderee', 'ScoreGlobal_Normalise_div45', 'ScoreGlobal_Pourcentage',
+                'Niveau', 'ClasseProjet', 'Exigences'
+            ];
+
+            const row = [
                 date, projectName, client, projectManager, bu,
                 ...criteriaValues,
                 axeScores[1].toFixed(2), axeScores[2].toFixed(2), axeScores[3].toFixed(2), axeScores[4].toFixed(2),
-                globalScore.toFixed(2), levelText, governance.class, governance.requirements
+                weightedSum.toFixed(2),
+                globalScore.toFixed(4),
+                (globalScore * 100).toFixed(1),
+                gov.levelText, gov.class, gov.short
             ];
 
-            const csvContent = headers.join(';') + '\n' + values.map(v => `"${v}"`).join(';');
+            const csvContent =
+                headers.join(';') + '\n' +
+                row.map(v => `"${String(v).replaceAll('"', '""')}"`).join(';');
 
-            // Download
             const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -690,12 +989,10 @@
             link.click();
         }
 
-        // Print
-        function printPage() {
-            window.print();
-        }
 
-        // Initialize Element SDK
+        function printPage() { window.print(); }
+
+        // Element SDK
         async function initElementSdk() {
             if (window.elementSdk) {
                 await window.elementSdk.init({
@@ -704,12 +1001,7 @@
                         document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
                         document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
                     },
-                    mapToCapabilities: (config) => ({
-                        recolorables: [],
-                        borderables: [],
-                        fontEditable: undefined,
-                        fontSizeable: undefined
-                    }),
+                    mapToCapabilities: () => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
                     mapToEditPanelValues: (config) => new Map([
                         ['main_title', config.main_title || defaultConfig.main_title],
                         ['subtitle', config.subtitle || defaultConfig.subtitle]
@@ -718,26 +1010,20 @@
             }
         }
 
-        // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize SDK
             initElementSdk();
 
-            // Add change listeners to all selects
             document.querySelectorAll('.criterion-select').forEach(select => {
                 select.addEventListener('change', updateUI);
             });
 
-            // Button listeners
             document.getElementById('btn-reset').addEventListener('click', resetForm);
             document.getElementById('btn-csv').addEventListener('click', exportCSV);
             document.getElementById('btn-print').addEventListener('click', printPage);
 
-            // Initial calculation
             updateUI();
         });
     </script>
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9c91885dd33b5bce',t:'MTc3MDI4NTMzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
 
 </html>
