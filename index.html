@@ -847,8 +847,11 @@
             const vigilancePoints = getVigilancePoints();
 
             // Score display: normalized 0..1 and percent
-            document.getElementById('score-display').textContent = globalScore.toFixed(2).replace('.', ',');
-            document.getElementById('score-sub').textContent = `Score normalisé (≈ ${(globalScore * 100).toFixed(0)}%) — Σ pondéré / 45`;
+            //document.getElementById('score-display').textContent = globalScore.toFixed(2).replace('.', ',');
+            const scorePercent = Math.round(globalScore * 100);
+            document.getElementById('score-display').textContent = scorePercent + " %";
+
+            document.getElementById('score-sub').textContent = ``;
 
             // Gauge: map score from 0.333..1 to [0..1]
             const gaugeCircle = document.getElementById('gauge-circle');
