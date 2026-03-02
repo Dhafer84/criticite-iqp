@@ -1,0 +1,8 @@
+name = "criticite-iqp-api"
+main = "src/index.js"
+compatibility_date = "2026-03-02"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "criticite_iqp"
+database_id = "16ccdcb5-ad26-4e02-be1a-5ce6d07e765c"

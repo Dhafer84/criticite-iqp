@@ -1,2 +1,15 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Wrangler / logs
+.wrangler/
+**/.wrangler/
+*.log
+
+# macOS
 .DS_Store
-Thumbs.db
+
+# Envs
+.env
+.env.*
