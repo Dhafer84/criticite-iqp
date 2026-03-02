@@ -687,11 +687,10 @@
         //   POST   /api/projects      (upsert)
         //   DELETE /api/projects/:id
         // const API_BASE = "http://localhost:3000/api";
-        //const API_BASE = "https://criticite-iqp-api.boutheljad84.workers.dev";
         const API_BASE =
             location.hostname.includes("pages.dev")
-                ? "https://criticite-iqp-api.boutheljad84.workers.dev"
-                : "http://localhost:3000";
+                ? "https://criticite-iqp-api.boutheljad84.workers.dev/api"
+                : "http://localhost:3000/api";
 
         function makeProjectId(projectName, client) {
             const base = `${(projectName || "").trim()}__${(client || "").trim()}`.toLowerCase();
