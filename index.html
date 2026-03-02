@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Évaluation de criticité projet (IQP)</title>
+    <title>Évaluation de criticité projet</title>
     <script src="/_sdk/element_sdk.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -93,7 +93,7 @@
                 </div>
 
                 <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Évaluation de criticité
-                    projet (IQP)</h1>
+                    projet</h1>
                 <p id="subtitle" class="text-lg text-slate-600">Scoring par axes pondérés – coefficients 3/6/9</p>
             </header>
 
@@ -109,6 +109,27 @@
                             Informations projet
                         </h2>
                         <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Gestion des projets (DB JSON via API) -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Projets enregistrés</label>
+                                <div class="flex flex-col md:flex-row gap-2">
+                                    <select id="project-selector"
+                                        class="w-full md:flex-1 px-3 py-2.5 border border-slate-300 rounded-xl bg-white">
+                                        <option value="">— Sélectionner un projet —</option>
+                                    </select>
+
+                                    <button id="btn-delete-project"
+                                        class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-xl transition-all">
+                                        Supprimer
+                                    </button>
+                                </div>
+                                <div class="mt-2 flex items-center justify-between">
+                                    <p class="text-xs text-slate-500">Enregistrement manuel (clé unique = Nom + Client).
+                                    </p>
+                                    <span id="save-status" class="text-xs text-slate-500"></span>
+                                </div>
+                            </div>
+
                             <div>
                                 <label for="project-name" class="block text-sm font-medium text-slate-700 mb-1">Nom du
                                     projet</label>
@@ -325,7 +346,9 @@
                                             <option value="6" selected>6 - Moyen</option>
                                             <option value="9">9 - Critique</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">3=Standard, 6=Moyen, 9=Critique</p>
+                                        <p class="text-xs text-slate-500 mt-1">3=Standard(ISO9001, ISO27001),
+                                            6=Moyen(Normes de Test (validation, qualification, conception)),
+                                            9=Critique(ASPICE, CYBER Security, Safety , AI)</p>
                                     </div>
 
                                     <div>
@@ -374,7 +397,8 @@
                                             <option value="6" selected>6 - Moyenne</option>
                                             <option value="9">9 - Large / distribuée</option>
                                         </select>
-                                        <p class="text-xs text-slate-500 mt-1">3=Petite, 6=Moyenne, 9=Large/distribuée
+                                        <p class="text-xs text-slate-500 mt-1">0-5=Petite, 5-10=Moyenne,
+                                            >10=Large/distribuée
                                         </p>
                                     </div>
 
@@ -599,6 +623,14 @@
                     Réinitialiser
                 </button>
 
+
+                <button id="btn-save"
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Enregistrer
+                </button>
                 <button id="btn-csv"
                     class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-all shadow-sm hover:shadow-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -647,6 +679,198 @@
         // Denominator from your rule: /45
         const GLOBAL_DENOMINATOR = 45;
 
+        // ---- Persistance DB JSON via API (Node/Express) ----
+        // Backend attendu : http://localhost:3000
+        // Endpoints :
+        //   GET    /api/projects
+        //   GET    /api/projects/:id
+        //   POST   /api/projects      (upsert)
+        //   DELETE /api/projects/:id
+        const API_BASE = "http://localhost:3000/api";
+
+        function makeProjectId(projectName, client) {
+            const base = `${(projectName || "").trim()}__${(client || "").trim()}`.toLowerCase();
+            return base
+                .normalize("NFKD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9_ -]/g, "")
+                .replace(/\s+/g, "-")
+                .replace(/-+/g, "-").replace(/^[-_]+|[-_]+$/g, "");
+        }
+
+        function getProjectIdentity() {
+            const projectName = (document.getElementById("project-name").value || "").trim();
+            const client = (document.getElementById("client").value || "").trim();
+            return { projectName, client };
+        }
+
+        function getProjectId() {
+            const { projectName, client } = getProjectIdentity();
+            if (!projectName || !client) return "";
+            return makeProjectId(projectName, client);
+        }
+
+        function getProjectLabel() {
+            const { projectName, client } = getProjectIdentity();
+            if (!projectName || !client) return "";
+            return `${projectName} — ${client}`;
+        }
+
+        function setSaveStatus(text, isError = false) {
+            const el = document.getElementById("save-status");
+            if (!el) return;
+            el.textContent = text || "";
+            el.className = isError ? "text-xs text-rose-600" : "text-xs text-slate-500";
+        }
+
+        let IS_DIRTY = false;
+
+        function markDirty(dirty) {
+            IS_DIRTY = !!dirty;
+            if (IS_DIRTY) {
+                setSaveStatus("Modifications non enregistrées");
+                return;
+            }
+
+            // Pas de modifications en cours
+            const id = getProjectId();
+            if (!id) {
+                setSaveStatus("Prêt. Remplis puis clique sur Enregistrer.");
+            } else {
+                setSaveStatus("Enregistré ✅");
+            }
+        }
+
+        window.addEventListener("beforeunload", (e) => {
+            if (!IS_DIRTY) return;
+            e.preventDefault();
+            e.returnValue = "";
+        });
+
+        function readFormData() {
+            const { projectName, client } = getProjectIdentity();
+            const projectManager = document.getElementById("project-manager").value || "";
+            const bu = document.getElementById("bu").value || "";
+
+            const criteria = {};
+            document.querySelectorAll(".criterion-select").forEach(select => {
+                criteria[select.id] = select.value;
+            });
+
+            return {
+                id: getProjectId(),
+                label: getProjectLabel(),
+                meta: { projectName, client, projectManager, bu },
+                criteria,
+                updatedAt: new Date().toISOString()
+            };
+        }
+
+        function applyFormData(data) {
+            if (!data) return;
+
+            document.getElementById("project-name").value = data.meta?.projectName ?? "";
+            document.getElementById("client").value = data.meta?.client ?? "";
+            document.getElementById("project-manager").value = data.meta?.projectManager ?? "";
+            document.getElementById("bu").value = data.meta?.bu ?? "";
+
+            const criteria = data.criteria || {};
+            document.querySelectorAll(".criterion-select").forEach(select => {
+                if (criteria[select.id]) select.value = criteria[select.id];
+            });
+
+            updateUI();
+        }
+
+        async function apiRequest(path, options = {}) {
+            const res = await fetch(`${API_BASE}${path}`, {
+                headers: { "Content-Type": "application/json" },
+                ...options
+            });
+
+            if (!res.ok) {
+                const msg = await res.text().catch(() => "");
+                throw new Error(msg || `HTTP ${res.status}`);
+            }
+
+            // DELETE peut retourner vide
+            const contentType = res.headers.get("content-type") || "";
+            if (contentType.includes("application/json")) return await res.json();
+            return null;
+        }
+
+        async function refreshProjectsDropdown(selectedId = "") {
+            const selector = document.getElementById("project-selector");
+            if (!selector) return;
+
+            selector.innerHTML = `<option value="">— Sélectionner un projet —</option>`;
+
+            try {
+                const list = await apiRequest("/projects", { method: "GET" }) || [];
+                list.forEach(item => {
+                    const opt = document.createElement("option");
+                    opt.value = item.id;
+                    opt.textContent = item.label || `${item.projectName || ""} — ${item.client || ""}`.trim() || item.id;
+                    selector.appendChild(opt);
+                });
+
+                if (selectedId) selector.value = selectedId;
+            } catch (e) {
+                // Si le backend n'est pas lancé
+                setSaveStatus("Backend non disponible (lancer le serveur).", true);
+            }
+        }
+
+        async function saveCurrentProjectNow() {
+            const id = getProjectId();
+            const label = getProjectLabel();
+            if (!id) {
+                markDirty(false);
+                return;
+            }
+
+            try {
+                setSaveStatus("Sauvegarde…");
+                const payload = readFormData();
+                await apiRequest("/projects", { method: "POST", body: JSON.stringify(payload) });
+                setSaveStatus("Sauvegardé ✅");
+                await refreshProjectsDropdown(id);
+                markDirty(false);
+
+                // S'assurer que le projet courant apparaît sélectionné
+                const selector = document.getElementById("project-selector");
+                if (selector) selector.value = id;
+            } catch (e) {
+                setSaveStatus("Erreur sauvegarde : " + e.message, true);
+            }
+        }
+
+        async function loadProjectById(id) {
+            if (!id) return;
+            try {
+                const data = await apiRequest(`/projects/${encodeURIComponent(id)}`, { method: "GET" });
+                applyFormData(data);
+                setSaveStatus("Chargé ✅");
+                markDirty(false);
+            } catch (e) {
+                setSaveStatus("Erreur chargement : " + e.message, true);
+            }
+        }
+
+        async function deleteProjectById(id) {
+            if (!id) return;
+            try {
+                await apiRequest(`/projects/${encodeURIComponent(id)}`, { method: "DELETE" });
+                setSaveStatus("Supprimé ✅");
+                await refreshProjectsDropdown("");
+                resetForm();
+                markDirty(false);
+            } catch (e) {
+                setSaveStatus("Erreur suppression : " + e.message, true);
+            }
+        }
+
+
         // Labels for vigilance points (criteria at 9)
         const CRITERIA_LABELS = {
             // Axe 1
@@ -683,9 +907,7 @@
                 detailsHtml: `
         <div class="mt-2 text-sm">
           <p><span class="font-semibold">Objectif :</span> Assurer un niveau minimum de conformité sans surcharger le projet.</p>
-          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Non requis</p>
           <p><span class="font-semibold">Responsable qualité :</span> Chef de projet</p>
-          <p><span class="font-semibold">Taux d’affectation qualité :</span> 0%</p>
           <p class="mt-2 font-semibold">Activités qualité</p>
           <ul class="list-disc ml-5">
             <li>Utilisation des templates et des process standards</li>
@@ -715,8 +937,6 @@
                 detailsHtml: `
         <div class="mt-2 text-sm">
           <p><span class="font-semibold">Objectif :</span> Maîtriser les risques projet et garantir la conformité des livrables.</p>
-          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Requis (dédié au projet)</p>
-          <p><span class="font-semibold">Taux d’affectation qualité :</span> 15% à 30% (à titre d’exemple)</p>
           <p class="mt-2 font-semibold">Activités qualité</p>
           <ul class="list-disc ml-5">
             <li>Élaboration du Quality Assurance Plan (QAP)</li>
@@ -755,8 +975,6 @@
                 detailsHtml: `
         <div class="mt-2 text-sm">
           <p><span class="font-semibold">Objectif :</span> Sécuriser un projet à fort enjeu par une gouvernance qualité renforcée et indépendante.</p>
-          <p class="mt-1"><span class="font-semibold">Ingénieur qualité :</span> Requis (dédié, voire équipe qualité)</p>
-          <p><span class="font-semibold">Taux d’affectation qualité :</span> 50% à 100% (à titre d’exemple)</p>
           <p class="mt-2 font-semibold">Activités qualité</p>
           <ul class="list-disc ml-5">
             <li>Élaboration du Quality Assurance Plan (QAP)</li>
@@ -1013,14 +1231,64 @@
             }
         }
 
+
         document.addEventListener('DOMContentLoaded', () => {
             initElementSdk();
 
-            document.querySelectorAll('.criterion-select').forEach(select => {
-                select.addEventListener('change', updateUI);
+            // Init projets depuis la DB JSON (via API)
+            refreshProjectsDropdown();
+            markDirty(false);
+
+            // Autosave: champs texte (Nom + Client inclus)
+            ['project-name', 'client', 'project-manager', 'bu'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', () => {
+                    markDirty(true);
+                });
             });
 
-            document.getElementById('btn-reset').addEventListener('click', resetForm);
+            // Autosave + recalcul: critères
+            document.querySelectorAll('.criterion-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    updateUI();
+                    markDirty(true);
+                });
+            });
+
+            // Charger un projet
+            const selector = document.getElementById('project-selector');
+            if (selector) {
+                selector.addEventListener('change', async (e) => {
+                    const id = e.target.value;
+                    if (id) await loadProjectById(id);
+                });
+            }
+
+            // Supprimer un projet
+            const btnDelete = document.getElementById('btn-delete-project');
+            if (btnDelete) {
+                btnDelete.addEventListener('click', async () => {
+                    const id = document.getElementById('project-selector')?.value || '';
+                    if (id) await deleteProjectById(id);
+                });
+            }
+
+
+            // Enregistrer (manuel)
+            const btnSave = document.getElementById('btn-save');
+            if (btnSave) {
+                btnSave.addEventListener('click', async () => {
+                    await saveCurrentProjectNow();
+                });
+            }
+
+            // Actions existantes
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                resetForm();
+                markDirty(true);
+                setSaveStatus("Formulaire réinitialisé (non enregistré).");
+            });
             document.getElementById('btn-csv').addEventListener('click', exportCSV);
             document.getElementById('btn-print').addEventListener('click', printPage);
 
