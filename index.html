@@ -686,9 +686,7 @@
         //   GET    /api/projects/:id
         //   POST   /api/projects      (upsert)
         //   DELETE /api/projects/:id
-        // const API_BASE = location.hostname.includes("pages.dev")
-                ? "https://criticite-iqp-api.boutheljad84.workers.dev/api"
-                : "http://localhost:3000/api";
+        // const API_BASE = "http://localhost:3000/api";
         const API_BASE =
             location.hostname.includes("pages.dev")
                 ? "https://criticite-iqp-api.boutheljad84.workers.dev/api"
@@ -1314,7 +1312,7 @@ function buildDbSnapshotPayload() {
             updateUI();
         }
 
-        function exportCurrentCSV() {
+        function exportCSV() {
             const { axeScores, weightedSum, globalScore } = calculateScores();
             const level = getCriticalityLevel(globalScore);
             const gov = GOVERNANCE[level];
@@ -1382,104 +1380,7 @@ function buildDbSnapshotPayload() {
         }
 
 
-        
-
-            // Exporter TOUTE la base (D1) en CSV (Excel-compatible)
-            async function exportAllFromDb() {
-                try {
-                    setSaveStatus("Export DB en cours...");
-
-                    // 1) Liste des projets (résumé)
-                    const list = await apiRequest('/projects', { method: 'GET' });
-                    if (!Array.isArray(list) || list.length === 0) {
-                        setSaveStatus("Aucun projet enregistré dans la base.");
-                        return;
-                    }
-
-                    // 2) Charger le détail de chaque projet (contient le snapshot export)
-                    const details = await Promise.all(
-                        list.map(p => apiRequest(`/projects/${encodeURIComponent(p.id)}`, { method: 'GET' }))
-                    );
-
-                    // 3) Construire un CSV global à partir des snapshots export (headers + row)
-                    const baseHeaders = ["db_id", "db_savedAt"];
-                    const headerSet = new Set(baseHeaders);
-
-                    // Construire une union des headers (si jamais le formulaire évolue)
-                    const snaps = details.map(d => d?.criteria?.exportSnapshot).filter(Boolean);
-                    for (const s of snaps) {
-                        if (Array.isArray(s.headers)) {
-                            for (const h of s.headers) headerSet.add(h);
-                        }
-                    }
-
-                    const headers = Array.from(headerSet);
-
-                    // mapping header -> index
-                    const headerIndex = {};
-                    headers.forEach((h, i) => headerIndex[h] = i);
-
-                    const rows = [];
-
-                    for (const d of details) {
-                        const rowArr = new Array(headers.length).fill("");
-
-                        rowArr[headerIndex["db_id"]] = d?.id ?? "";
-                        rowArr[headerIndex["db_savedAt"]] = d?.savedAt ?? "";
-
-                        const snap = d?.criteria?.exportSnapshot;
-                        if (snap && Array.isArray(snap.headers) && Array.isArray(snap.row)) {
-                            // Aligner les valeurs selon leur header
-                            snap.headers.forEach((h, i) => {
-                                const idx = headerIndex[h];
-                                if (idx !== undefined) rowArr[idx] = snap.row[i] ?? "";
-                            });
-                        } else {
-                            // fallback : on dump un JSON si snapshot absent
-                            const idx = headerIndex["json_dump"] ?? null;
-                            if (idx === null) {
-                                // si "json_dump" n'existe pas encore dans headers, on l'ajoute à la fin
-                                headers.push("json_dump");
-                                headerIndex["json_dump"] = headers.length - 1;
-                                rowArr.push(JSON.stringify(d));
-                            } else {
-                                rowArr[idx] = JSON.stringify(d);
-                            }
-                        }
-
-                        rows.push(rowArr);
-                    }
-
-                    // CSV helpers (délimiteur ; pour Excel FR)
-                    const esc = (v) => {
-                        const s = (v === null || v === undefined) ? "" : String(v);
-                        return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-                    };
-
-                    const csvText = headers.map(esc).join(";") + "\n" +
-                        rows.map(r => r.map(esc).join(";")).join("\n");
-
-                    const ts = new Date().toISOString().slice(0, 10);
-                    const filename = `evaluation-criticite-db-${ts}.csv`;
-
-                    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-                    setSaveStatus("Export DB terminé ✅");
-                } catch (e) {
-                    console.error(e);
-                    setSaveStatus("Erreur export DB: " + (e?.message || e), true);
-                }
-            }
-
-function printPage() { window.print(); }
+        function printPage() { window.print(); }
 
         // Element SDK
         async function initElementSdk() {
@@ -1557,7 +1458,7 @@ function printPage() { window.print(); }
                 markDirty(true);
                 setSaveStatus("Formulaire réinitialisé (non enregistré).");
             });
-            document.getElementById('btn-csv').addEventListener('click', exportAllFromDb);
+            document.getElementById('btn-csv').addEventListener('click', exportCSV);
             document.getElementById('btn-print').addEventListener('click', printPage);
 
             updateUI();
