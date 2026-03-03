@@ -1379,6 +1379,92 @@ function buildDbSnapshotPayload() {
             link.click();
         }
 
+        // Export complet depuis la base (D1 via Worker)
+        function csvEscapeDb(value) {
+            const s = value === null || value === undefined ? '' : String(value);
+            return /[;"\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+        }
+
+        function downloadCsvDb(filename, csvText) {
+            const blob = new Blob(['\ufeff' + csvText], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }
+
+        async function exportAllFromDb() {
+            // 1) Liste des projets
+            const listRes = await fetch(`${API_BASE}/projects`, { method: 'GET' });
+            if (!listRes.ok) throw new Error(`GET /projects (${listRes.status})`);
+            const projects = await listRes.json();
+
+            if (!Array.isArray(projects) || projects.length === 0) {
+                alert('Aucun projet enregistré dans la base.');
+                return;
+            }
+
+            // 2) Charger le détail de chaque projet (contient criteria.exportSnapshot)
+            const detailed = await Promise.all(projects.map(async (p) => {
+                const r = await fetch(`${API_BASE}/projects/${encodeURIComponent(p.id)}`, { method: 'GET' });
+                if (!r.ok) throw new Error(`GET /projects/${p.id} (${r.status})`);
+                return await r.json();
+            }));
+
+            // 3) Construire un CSV global robuste (union des headers)
+            const globalHeaders = [];
+            const addHeader = (h) => { if (!globalHeaders.includes(h)) globalHeaders.push(h); };
+
+            addHeader('db_id');
+            addHeader('db_savedAt');
+
+            // Collect union of headers from snapshots
+            for (const item of detailed) {
+                const snap = item?.criteria?.exportSnapshot;
+                if (snap?.headers && Array.isArray(snap.headers)) {
+                    for (const h of snap.headers) addHeader(h);
+                }
+            }
+
+            // If no exportSnapshot found, fallback to JSON dump
+            if (globalHeaders.length <= 2) {
+                addHeader('json_dump');
+            }
+
+            const rows = detailed.map((item) => {
+                const rowMap = new Map();
+                const snap = item?.criteria?.exportSnapshot;
+
+                if (snap?.headers && Array.isArray(snap.headers) && Array.isArray(snap.row)) {
+                    snap.headers.forEach((h, i) => rowMap.set(h, snap.row[i]));
+                }
+
+                const out = [];
+                out.push(item?.id ?? '');
+                out.push(item?.savedAt ?? item?.saved_at ?? '');
+
+                if (globalHeaders.length > 2 && globalHeaders[2] === 'json_dump') {
+                    out.push(JSON.stringify(item));
+                    return out;
+                }
+
+                // Fill all snapshot columns
+                for (let i = 2; i < globalHeaders.length; i++) {
+                    const h = globalHeaders[i];
+                    out.push(rowMap.has(h) ? rowMap.get(h) : '');
+                }
+                return out;
+            });
+
+            const csv =
+                globalHeaders.map(csvEscapeDb).join(';') + '\n' +
+                rows.map(r => r.map(csvEscapeDb).join(';')).join('\n');
+
+            const ts = new Date().toISOString().split('T')[0];
+            downloadCsvDb(`criticite-iqp-db-export-${ts}.csv`, csv);
+        }
+
 
         function printPage() { window.print(); }
 
@@ -1458,7 +1544,20 @@ function buildDbSnapshotPayload() {
                 markDirty(true);
                 setSaveStatus("Formulaire réinitialisé (non enregistré).");
             });
-            document.getElementById('btn-csv').addEventListener('click', exportCSV);
+            document.getElementById('btn-csv').addEventListener('click', async (e) => {
+                try {
+                    // OK => export tout depuis la base, Annuler => export du projet courant
+                    const exportDb = confirm('Exporter tous les projets enregistrés dans la base (D1) ?\n\nOK : Export DB (tous les projets)\nAnnuler : Export du projet courant');
+                    if (exportDb) {
+                        await exportAllFromDb();
+                    } else {
+                        exportCSV();
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Erreur export: ' + (err?.message || err));
+                }
+            });
             document.getElementById('btn-print').addEventListener('click', printPage);
 
             updateUI();
