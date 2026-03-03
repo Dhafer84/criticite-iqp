@@ -686,7 +686,9 @@
         //   GET    /api/projects/:id
         //   POST   /api/projects      (upsert)
         //   DELETE /api/projects/:id
-        // const API_BASE = "http://localhost:3000/api";
+        // const API_BASE = location.hostname.includes("pages.dev")
+                ? "https://criticite-iqp-api.boutheljad84.workers.dev/api"
+                : "http://localhost:3000/api";
         const API_BASE =
             location.hostname.includes("pages.dev")
                 ? "https://criticite-iqp-api.boutheljad84.workers.dev/api"
@@ -770,30 +772,182 @@
             };
         }
 
-        function applyFormData(data) {
-            if (!data) return;
+// ---- Snapshot complet pour la DB (comme l'export CSV) ----
+function collectAllFieldsById() {
+    const out = {};
+    document.querySelectorAll("input[id], select[id], textarea[id]").forEach(el => {
+        if (!el.id) return;
+        if (el.tagName === "INPUT" && el.type === "checkbox") out[el.id] = !!el.checked;
+        else out[el.id] = el.value;
+    });
+    return out;
+}
 
-            document.getElementById("project-name").value = data.meta?.projectName ?? "";
-            document.getElementById("client").value = data.meta?.client ?? "";
-            document.getElementById("project-manager").value = data.meta?.projectManager ?? "";
-            document.getElementById("bu").value = data.meta?.bu ?? "";
+// Ordre des critères (doit matcher les IDs du formulaire) - identique à l'export CSV
+const EXPORT_CRITERIA = [
+    { id: 'c1-1', col: 'Axe1_CriticiteStrategique_ImportanceDuMarche' },
+    { id: 'c1-2', col: 'Axe1_CriticiteStrategique_VisibiliteImpactImage' },
+    { id: 'c1-3', col: 'Axe1_CriticiteStrategique_DependanceAutresProjets' },
 
-            const criteria = data.criteria || {};
-            document.querySelectorAll(".criterion-select").forEach(select => {
-                if (criteria[select.id]) select.value = criteria[select.id];
-            });
+    { id: 'c2-1', col: 'Axe2_ComplexiteTechnique_ComplexiteArchitecture' },
+    { id: 'c2-2', col: 'Axe2_ComplexiteTechnique_MaturiteTechnologique' },
+    { id: 'c2-3', col: 'Axe2_ComplexiteTechnique_IntegrationInterfaces' },
 
-            updateUI();
+    { id: 'c3-1', col: 'Axe3_RisqueProjet_RisquePlanning' },
+    { id: 'c3-2', col: 'Axe3_RisqueProjet_RisqueCout' },
+    { id: 'c3-3', col: 'Axe3_RisqueProjet_ContraintesNormatives' },
+    { id: 'c3-4', col: 'Axe3_RisqueProjet_DureeDuProjet' },
+
+    { id: 'c4-1', col: 'Axe4_RisqueOrgClient_TailleDispersionEquipe' },
+    { id: 'c4-2', col: 'Axe4_RisqueOrgClient_NatureDuProjet' },
+    { id: 'c4-3', col: 'Axe4_RisqueOrgClient_TypeDuClient' },
+    { id: 'c4-4', col: 'Axe4_RisqueOrgClient_DisponibiliteClient' },
+    { id: 'c4-5', col: 'Axe4_RisqueOrgClient_CooperationStabiliteDecisionnelle' }
+];
+
+function buildExportSnapshot(meta, criteriaById) {
+    const { axeScores, weightedSum, globalScore } = calculateScores();
+    const level = getCriticalityLevel(globalScore);
+    const gov = GOVERNANCE[level];
+
+    const date = new Date().toISOString().split('T')[0];
+
+    const criteriaValues = EXPORT_CRITERIA.map(c => {
+        const v = criteriaById?.[c.id];
+        return (v === undefined || v === null) ? "" : String(v);
+    });
+
+    const headers = [
+        'Date', 'Projet', 'Client', 'ChefDeProjet', 'BU',
+        ...EXPORT_CRITERIA.map(c => c.col),
+        'ScoreAxe1_MoyenneCoeff', 'ScoreAxe2_MoyenneCoeff', 'ScoreAxe3_MoyenneCoeff', 'ScoreAxe4_MoyenneCoeff',
+        'SommePonderee', 'ScoreGlobal_Normalise_div45', 'ScoreGlobal_Pourcentage',
+        'Niveau', 'ClasseProjet', 'Exigences'
+    ];
+
+    const row = [
+        date,
+        meta.projectName || 'Non renseigné',
+        meta.client || 'Non renseigné',
+        meta.projectManager || 'Non renseigné',
+        meta.bu || 'Non renseigné',
+        ...criteriaValues,
+        axeScores[1].toFixed(2),
+        axeScores[2].toFixed(2),
+        axeScores[3].toFixed(2),
+        axeScores[4].toFixed(2),
+        weightedSum.toFixed(2),
+        globalScore.toFixed(4),
+        (globalScore * 100).toFixed(1),
+        gov.levelText,
+        gov.class,
+        gov.short
+    ];
+
+    return {
+        date,
+        headers,
+        row,
+        computed: {
+            axeScores,
+            weightedSum,
+            globalScore,
+            level,
+            governance: {
+                levelText: gov.levelText,
+                class: gov.class,
+                short: gov.short
+            }
         }
+    };
+}
+
+function buildDbSnapshotPayload() {
+    const base = readFormData(); // {id,label,meta,criteria,...}
+    const criteriaById = base.criteria || {};
+    const allFields = collectAllFieldsById();
+    const exportSnapshot = buildExportSnapshot(base.meta, criteriaById);
+
+    return {
+        criteriaById,         // pour recharger les selects (ancien format)
+        allFields,            // tous les champs par id (comme l'export)
+        exportSnapshot        // headers/row/calculs identiques à l'export CSV
+    };
+}
+
+        function applyFormData(data) {
+    if (!data) return;
+
+    // Meta (toujours prioritaire)
+    const meta = data.meta || {};
+    const setVal = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.value = v ?? "";
+    };
+
+    setVal("project-name", meta.projectName ?? "");
+    setVal("client", meta.client ?? "");
+    setVal("project-manager", meta.projectManager ?? "");
+    setVal("bu", meta.bu ?? "");
+
+    // Nouveau format: on peut stocker un snapshot complet dans "criteria"
+    const saved = data.criteria || {};
+
+    // 1) Si on a un snapshot complet, restaurer tous les champs par id
+    const allFields = saved.allFields || null;
+    if (allFields && typeof allFields === "object") {
+        Object.entries(allFields).forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            // Ne pas écraser les 4 champs meta déjà posés (ils restent la source de vérité)
+            if (["project-name", "client", "project-manager", "bu"].includes(id)) return;
+
+            if (el.tagName === "INPUT") {
+                if (el.type === "checkbox") el.checked = !!val;
+                else el.value = val ?? "";
+            } else if (el.tagName === "SELECT" || el.tagName === "TEXTAREA") {
+                el.value = val ?? "";
+            }
+        });
+    }
+
+    // 2) Toujours restaurer les critères (format ancien ou nouveau)
+    const criteriaById = saved.criteriaById || saved.criteria || saved;
+    document.querySelectorAll(".criterion-select").forEach(select => {
+        if (criteriaById && Object.prototype.hasOwnProperty.call(criteriaById, select.id)) {
+            select.value = criteriaById[select.id];
+        }
+    });
+
+    updateUI();
+}
+
 
         async function apiRequest(path, options = {}) {
-            const res = await fetch(`${API_BASE}${path}`, {
-                headers: { "Content-Type": "application/json" },
-                ...options
-            });
+            const url = `${API_BASE}${path}`;
+
+            // ✅ Ne pas forcer "Content-Type: application/json" sur GET/DELETE
+            // (ça déclenche un preflight CORS inutile et peut provoquer "Load failed" si OPTIONS n'est pas bien géré)
+            const headers = { ...(options.headers || {}) };
+            const hasBody = options.body !== undefined && options.body !== null;
+
+            if (hasBody && !headers["Content-Type"] && !headers["content-type"]) {
+                headers["Content-Type"] = "application/json";
+            }
+
+            const res = await fetch(url, { ...options, headers });
 
             if (!res.ok) {
-                const msg = await res.text().catch(() => "");
+                // Essayer de récupérer un message lisible (JSON ou texte)
+                const ct = res.headers.get("content-type") || "";
+                let msg = "";
+                if (ct.includes("application/json")) {
+                    const j = await res.json().catch(() => null);
+                    msg = j?.error || j?.message || JSON.stringify(j || {});
+                } else {
+                    msg = await res.text().catch(() => "");
+                }
                 throw new Error(msg || `HTTP ${res.status}`);
             }
 
@@ -826,28 +980,41 @@
         }
 
         async function saveCurrentProjectNow() {
-            const id = getProjectId();
-            const label = getProjectLabel();
-            if (!id) {
-                markDirty(false);
-                return;
-            }
+    const id = getProjectId();
+    const label = getProjectLabel();
+    if (!id) {
+        setSaveStatus("Renseigne Nom + Client pour activer la sauvegarde.");
+        return;
+    }
 
-            try {
-                setSaveStatus("Sauvegarde…");
-                const payload = readFormData();
-                await apiRequest("/projects", { method: "POST", body: JSON.stringify(payload) });
-                setSaveStatus("Sauvegardé ✅");
-                await refreshProjectsDropdown(id);
-                markDirty(false);
+    try {
+        setSaveStatus("Sauvegarde…");
 
-                // S'assurer que le projet courant apparaît sélectionné
-                const selector = document.getElementById("project-selector");
-                if (selector) selector.value = id;
-            } catch (e) {
-                setSaveStatus("Erreur sauvegarde : " + e.message, true);
-            }
-        }
+        // ✅ Snapshot complet (toutes les données du formulaire + ligne export CSV)
+        const base = readFormData();               // meta + critères
+        const snapshot = buildDbSnapshotPayload(); // allFields + exportSnapshot + criteriaById
+
+        // On stocke TOUT dans la colonne criteria_json (D1) via la clé "criteria"
+        const payload = {
+            ...base,
+            label,
+            criteria: snapshot
+        };
+
+        await apiRequest("/projects", { method: "POST", body: JSON.stringify(payload) });
+
+        setSaveStatus("Sauvegardé ✅");
+        await refreshProjectsDropdown(id);
+
+        const selector = document.getElementById("project-selector");
+        if (selector) selector.value = id;
+
+        markDirty(false);
+    } catch (e) {
+        setSaveStatus("Erreur sauvegarde : " + e.message, true);
+    }
+}
+
 
         async function loadProjectById(id) {
             if (!id) return;
@@ -1147,7 +1314,7 @@
             updateUI();
         }
 
-        function exportCSV() {
+        function exportCurrentCSV() {
             const { axeScores, weightedSum, globalScore } = calculateScores();
             const level = getCriticalityLevel(globalScore);
             const gov = GOVERNANCE[level];
@@ -1215,7 +1382,104 @@
         }
 
 
-        function printPage() { window.print(); }
+        
+
+            // Exporter TOUTE la base (D1) en CSV (Excel-compatible)
+            async function exportAllFromDb() {
+                try {
+                    setSaveStatus("Export DB en cours...");
+
+                    // 1) Liste des projets (résumé)
+                    const list = await apiRequest('/projects', { method: 'GET' });
+                    if (!Array.isArray(list) || list.length === 0) {
+                        setSaveStatus("Aucun projet enregistré dans la base.");
+                        return;
+                    }
+
+                    // 2) Charger le détail de chaque projet (contient le snapshot export)
+                    const details = await Promise.all(
+                        list.map(p => apiRequest(`/projects/${encodeURIComponent(p.id)}`, { method: 'GET' }))
+                    );
+
+                    // 3) Construire un CSV global à partir des snapshots export (headers + row)
+                    const baseHeaders = ["db_id", "db_savedAt"];
+                    const headerSet = new Set(baseHeaders);
+
+                    // Construire une union des headers (si jamais le formulaire évolue)
+                    const snaps = details.map(d => d?.criteria?.exportSnapshot).filter(Boolean);
+                    for (const s of snaps) {
+                        if (Array.isArray(s.headers)) {
+                            for (const h of s.headers) headerSet.add(h);
+                        }
+                    }
+
+                    const headers = Array.from(headerSet);
+
+                    // mapping header -> index
+                    const headerIndex = {};
+                    headers.forEach((h, i) => headerIndex[h] = i);
+
+                    const rows = [];
+
+                    for (const d of details) {
+                        const rowArr = new Array(headers.length).fill("");
+
+                        rowArr[headerIndex["db_id"]] = d?.id ?? "";
+                        rowArr[headerIndex["db_savedAt"]] = d?.savedAt ?? "";
+
+                        const snap = d?.criteria?.exportSnapshot;
+                        if (snap && Array.isArray(snap.headers) && Array.isArray(snap.row)) {
+                            // Aligner les valeurs selon leur header
+                            snap.headers.forEach((h, i) => {
+                                const idx = headerIndex[h];
+                                if (idx !== undefined) rowArr[idx] = snap.row[i] ?? "";
+                            });
+                        } else {
+                            // fallback : on dump un JSON si snapshot absent
+                            const idx = headerIndex["json_dump"] ?? null;
+                            if (idx === null) {
+                                // si "json_dump" n'existe pas encore dans headers, on l'ajoute à la fin
+                                headers.push("json_dump");
+                                headerIndex["json_dump"] = headers.length - 1;
+                                rowArr.push(JSON.stringify(d));
+                            } else {
+                                rowArr[idx] = JSON.stringify(d);
+                            }
+                        }
+
+                        rows.push(rowArr);
+                    }
+
+                    // CSV helpers (délimiteur ; pour Excel FR)
+                    const esc = (v) => {
+                        const s = (v === null || v === undefined) ? "" : String(v);
+                        return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+                    };
+
+                    const csvText = headers.map(esc).join(";") + "\n" +
+                        rows.map(r => r.map(esc).join(";")).join("\n");
+
+                    const ts = new Date().toISOString().slice(0, 10);
+                    const filename = `evaluation-criticite-db-${ts}.csv`;
+
+                    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+                    setSaveStatus("Export DB terminé ✅");
+                } catch (e) {
+                    console.error(e);
+                    setSaveStatus("Erreur export DB: " + (e?.message || e), true);
+                }
+            }
+
+function printPage() { window.print(); }
 
         // Element SDK
         async function initElementSdk() {
@@ -1293,7 +1557,7 @@
                 markDirty(true);
                 setSaveStatus("Formulaire réinitialisé (non enregistré).");
             });
-            document.getElementById('btn-csv').addEventListener('click', exportCSV);
+            document.getElementById('btn-csv').addEventListener('click', exportAllFromDb);
             document.getElementById('btn-print').addEventListener('click', printPage);
 
             updateUI();
